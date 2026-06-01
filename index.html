@@ -360,6 +360,16 @@ function mkCC(cid,hid,arr){
   if(c){buildCC(cid,hid,arr||[]);}
   else{setTimeout(function(){mkCC(cid,hid,arr);},60);}
 }
+// tab switcher
+function swTab(pfx,n){
+  for(var i=0;i<8;i++){
+    var t=document.getElementById(pfx+'t'+i);
+    var p=document.getElementById(pfx+'p'+i);
+    if(t)t.classList.toggle('on',i===n);
+    if(p)p.classList.toggle('dn',i!==n);
+  }
+}
+
 // ── PAGE: HOME ─────────────────────────────────
 function pgHome(){
   var convs=DB.convs(),cands=DB.cands(),perfs=DB.perfiles();
