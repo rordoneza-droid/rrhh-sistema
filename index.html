@@ -1147,12 +1147,18 @@ function updCompTotal(){
 // ── INIT ───────────────────────────────────────
 (function init(){
   updateLogo();
+  go('home'); // render immediately — never block on network
   var c=getCfg();
   if(c.tok&&c.own&&c.repo){
     setSS('ing');
-    pullGH().then(function(){go('home');}).catch(function(){setSS('off');go('home');});
-  } else {
-    go('home');
+    // sync in background with timeout
+    var done=false;
+    var timer=setTimeout(function(){if(!done){done=true;setSS('err');}},8000);
+    pullGH().then(function(ok){
+      if(!done){done=true;clearTimeout(timer);if(ok)go(curPage);}
+    }).catch(function(){
+      if(!done){done=true;clearTimeout(timer);setSS('off');}
+    });
   }
 })();
 </script>
