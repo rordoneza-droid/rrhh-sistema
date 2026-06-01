@@ -326,39 +326,40 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 function updateLogo(){var c=getCfg();var e=document.getElementById('sb-emp');var r=document.getElementById('sb-ruc');if(e&&c.empresa)e.textContent='&#128101; '+c.empresa;if(r&&c.ruc)r.textContent='RUC: '+c.ruc;}
 
 // ── CHIPS ──────────────────────────────────────
-function gChips(hid){try{return JSON.parse(document.getElementById(hid)&&document.getElementById(hid).value||'[]')}catch(e){return[];}}
-function initCC(cid,hid,arr){
+function gChips(hid){
+  var el=document.getElementById(hid);
+  if(!el){var all=document.querySelectorAll('input[type=hidden]');for(var i=0;i<all.length;i++){if(all[i].id===hid){el=all[i];break;}}}
+  try{return el?JSON.parse(el.value||'[]'):[];}catch(e){return[];}
+}
+function buildCC(cid,hid,arr){
   var c=document.getElementById(cid);if(!c)return;
   c.innerHTML='';
+  var h=document.createElement('input');h.type='hidden';h.id=hid;h.value=JSON.stringify(arr);c.appendChild(h);
   arr.forEach(function(v){
     var sp=document.createElement('span');sp.className='chip';
-    sp.innerHTML=v+' <button class="chip-x" onclick="rmChip(\''+cid+'\',\''+hid+'\',\''+v.replace(/'/g,"\\'")+'\')">&times;</button>';
+    var safe=v.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    sp.innerHTML=v+' <button class="chip-x" type="button" onclick="rmChip(''+cid+'',''+hid+'',''+safe+'')">&times;</button>';
     c.appendChild(sp);
   });
   var inp=document.createElement('input');inp.type='text';inp.className='ci';inp.placeholder='Escribe y Enter...';
-  inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===','){e.preventDefault();var v=this.value.trim().replace(/,$/,'');if(v){var a=gChips(hid);if(!a.includes(v)){a.push(v);updChips(cid,hid,a);}this.value='';}}});
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===','){
+      e.preventDefault();
+      var v=this.value.trim().replace(/,$/,'');
+      if(v){var cur=gChips(hid);if(cur.indexOf(v)<0){cur.push(v);buildCC(cid,hid,cur);}this.value='';}
+    }
+  });
   c.appendChild(inp);
-  var h=document.getElementById(hid);if(h)h.value=JSON.stringify(arr);
   c.addEventListener('click',function(){inp.focus();});
 }
-function updChips(cid,hid,arr){var h=document.getElementById(hid);if(h)h.value=JSON.stringify(arr);initCC(cid,hid,arr);}
-function rmChip(cid,hid,val){updChips(cid,hid,gChips(hid).filter(function(v){return v!==val;}));}
+function updChips(cid,hid,arr){buildCC(cid,hid,arr);}
+function initCC(cid,hid,arr){buildCC(cid,hid,arr);}
+function rmChip(cid,hid,val){buildCC(cid,hid,gChips(hid).filter(function(v){return v!==val;}));}
 function mkCC(cid,hid,arr){
   var c=document.getElementById(cid);
-  if(c){c.innerHTML='<input type="hidden" id="'+hid+'" value="[]">';initCC(cid,hid,arr||[]);}
-  else{setTimeout(function(){mkCC(cid,hid,arr);},50);}
+  if(c){buildCC(cid,hid,arr||[]);}
+  else{setTimeout(function(){mkCC(cid,hid,arr);},60);}
 }
-
-// tab switcher - simple
-function swTab(pfx,n){
-  for(var i=0;i<8;i++){
-    var t=document.getElementById(pfx+'t'+i);
-    var p=document.getElementById(pfx+'p'+i);
-    if(t)t.classList.toggle('on',i===n);
-    if(p)p.classList.toggle('dn',i!==n);
-  }
-}
-
 // ── PAGE: HOME ─────────────────────────────────
 function pgHome(){
   var convs=DB.convs(),cands=DB.cands(),perfs=DB.perfiles();
@@ -485,15 +486,13 @@ function modalPerfil(id){
     expArea:'',funciones:[],habilidades:[],idiomas:['Espanol'],software:[],
     competencias:[{nombre:'Orientacion al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicacion',peso:25},{nombre:'Proactividad',peso:25}]};
   var nivs=['Bachillerato','Tecnico','Tecnologo','Tercer Nivel','Cuarto Nivel'];
-  var compH='';
-  var comps=v.competencias||[];
-  for(var i=0;i<4;i++){
-    var co=comps[i]||{nombre:'',peso:25};
-    compH+='<div class="fr fr2" style="align-items:center;margin-bottom:10px">'
-      +'<input id="cn'+i+'" value="'+co.nombre+'" placeholder="Competencia '+(i+1)+'">'
-      +'<div class="rw"><input type="range" id="cp'+i+'" min="0" max="100" value="'+co.peso+'" oninput="document.getElementById(\'cv'+i+'\').textContent=this.value+\'%\'">'
-      +'<span class="rv" id="cv'+i+'">'+co.peso+'%</span></div></div>';
-  }
+  var compH='<div id="comp_list">';
+  var comps=v.competencias&&v.competencias.length?v.competencias:[{nombre:'Orientacion al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicacion',peso:25},{nombre:'Proactividad',peso:25}];
+  comps.forEach(function(co,i){
+    compH+=compRow(i,co.nombre,co.peso);
+  });
+  compH+='</div><button class="btn bo bs mt2" onclick="addComp()" type="button">+ Agregar Competencia</button>'
+    +'<div class="mt2 tsm tgr" id="comp_total">Total: '+comps.reduce(function(s,c){return s+c.peso;},0)+'%</div>';
   var body='<div class="tabs">'
     +'<div class="tab on" id="pft0" onclick="swTab(\'pf\',0)">General</div>'
     +'<div class="tab" id="pft1" onclick="swTab(\'pf\',1)">Requisitos</div>'
@@ -524,7 +523,7 @@ function modalPerfil(id){
     +'<div class="fg"><label>Software</label><div class="cc" id="so_cc"><input type="hidden" id="so_h"></div></div>'
     +'</div>'
     +'<div id="pfp2" class="dn">'
-    +'<div class="al al-i">Define competencias y su peso. Suma debe ser 100%.</div>'
+    +'<div class="al al-i">Agrega las competencias que necesites. Suma de pesos debe ser 100%.</div>'
     +compH+'</div>';
 
   openM(id?'Editar Perfil':'Nuevo Perfil',body,
@@ -541,7 +540,10 @@ function modalPerfil(id){
 function saveP(id){
   function g(i){var e=document.getElementById(i);return e?e.value:'';}
   var comps=[];
-  for(var i=0;i<4;i++){var n=g('cn'+i).trim(),pe=parseInt(g('cp'+i)||0);if(n)comps.push({nombre:n,peso:pe});}
+  document.querySelectorAll('.comp-row').forEach(function(row){
+    var n=row.querySelector('.comp-n');var p=row.querySelector('.comp-p');
+    if(n&&n.value.trim())comps.push({nombre:n.value.trim(),peso:parseInt(p&&p.value||0)});
+  });
   var p={id:id||uid(),nombre:g('pf_n').trim(),area:g('pf_a').trim(),nivel:g('pf_nv'),
     salMin:g('pf_sm'),salMax:g('pf_sx'),modalidad:g('pf_mo'),jornada:g('pf_jo'),
     desc:g('pf_de').trim(),eduNiv:g('pf_en'),eduCam:g('pf_ec').trim(),
@@ -1105,6 +1107,31 @@ function confirmarSel(id){
   var just=document.getElementById('just_'+id);
   all[idx].etapa='seleccionado';if(just)all[idx].justificacion=just.value;
   DB.sCands(all);toast('Candidato confirmado','ok');pgInforme();
+}
+
+// ── COMP HELPERS ───────────────────────────────
+var _compIdx=100;
+function compRow(i,nombre,peso){
+  return '<div class="comp-row fr fr2" style="align-items:center;margin-bottom:10px" id="cr'+i+'">'
+    +'<input class="comp-n" value="'+(nombre||'')+'" placeholder="Nombre de la competencia" oninput="updCompTotal()">'
+    +'<div class="rw" style="flex:1">'
+    +'<input type="range" class="comp-p" min="0" max="100" value="'+(peso||25)+'" oninput="this.nextElementSibling.textContent=this.value+'%';updCompTotal()">'
+    +'<span class="rv">'+(peso||25)+'%</span>'
+    +'<button class="btn br bxs" onclick="this.closest('.comp-row').remove();updCompTotal()" type="button" title="Eliminar">&#10005;</button>'
+    +'</div></div>';
+}
+function addComp(){
+  _compIdx++;
+  var list=document.getElementById('comp_list');
+  if(!list)return;
+  list.insertAdjacentHTML('beforeend',compRow(_compIdx,'',25));
+  updCompTotal();
+}
+function updCompTotal(){
+  var total=0;
+  document.querySelectorAll('.comp-p').forEach(function(p){total+=parseInt(p.value||0);});
+  var el=document.getElementById('comp_total');
+  if(el){el.textContent='Total: '+total+'%';el.style.color=total===100?'var(--g)':'var(--r)';}
 }
 
 // ── INIT ───────────────────────────────────────
