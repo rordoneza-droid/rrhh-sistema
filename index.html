@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e293b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RRHH Pro">
+<link rel="manifest" id="pwa-manifest">
+<!-- PWA Icons inline -->
+<style>
+  @media(display-mode: standalone){
+    #tb { padding-top: env(safe-area-inset-top, 10px); }
+  }
+</style>
+<title>RRHH Pro — Selección de Personal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#2563eb;--pd:#1e40af;--pl:#eff6ff;
+  --g:#059669;--w:#d97706;--r:#dc2626;--i:#0891b2;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g400:#94a3b8;--g500:#64748b;--g600:#475569;--g700:#334155;
+  --g800:#1e293b;--g900:#0f172a;
+  --wh:#fff;--sh:0 1px 3px rgba(0,0,0,.1);--sh2:0 4px 6px -1px rgba(0,0,0,.1);
+  --r6:6px;--r10:10px;--r14:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;font-size:14px}
+#app{display:flex;min-height:100vh}
+#sb{width:240px;background:var(--g900);color:#fff;display:flex;flex-direction:column;flex-shrink:0;transition:.3s;z-index:200}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#tb{background:#fff;border-bottom:1px solid var(--g200);padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+#ct{flex:1;overflow-y:auto;padding:22px}
+.sb-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logo h2{font-size:14px;font-weight:700;color:#fff}
+.sb-logo p{font-size:11px;color:var(--g400);margin-top:2px}
+.sb-nav{flex:1;padding:6px 0;overflow-y:auto}
+.nav-sec{padding:14px 16px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g500)}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;color:var(--g400);font-size:13px;font-weight:500;transition:.15s;border-left:3px solid transparent}
+.ni:hover{background:rgba(255,255,255,.05);color:#fff}
+.ni.active{background:rgba(37,99,235,.2);color:#fff;border-left-color:var(--p)}
+.ni .ic{font-size:15px;width:18px;text-align:center}
+#tb h1{font-size:15px;font-weight:600;flex:1}
+.bti{background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--r6);color:var(--g500);font-size:18px;display:flex;align-items:center}
+.bti:hover{background:var(--g100)}
+#mt{display:none}
+/* sync indicator */
+#sync-status{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+.sync-ok{background:#d1fae5;color:#065f46}
+.sync-ing{background:#fef3c7;color:#92400e}
+.sync-err{background:#fee2e2;color:#991b1b}
+.sync-off{background:var(--g100);color:var(--g500)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r6);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:.15s;white-space:nowrap}
+.bp{background:var(--p);color:#fff}.bp:hover{background:var(--pd)}
+.bg{background:var(--g);color:#fff}
+.br{background:var(--r);color:#fff}
+.bw{background:var(--w);color:#fff}
+.bo{background:#fff;color:var(--g700);border:1px solid var(--g300)}.bo:hover{background:var(--g50)}
+.bgh{background:none;color:var(--p);border:none}.bgh:hover{background:var(--pl)}
+.bs{padding:5px 10px;font-size:12px}
+.bxs{padding:3px 8px;font-size:11px}
+/* cards */
+.card{background:#fff;border-radius:var(--r14);box-shadow:var(--sh);border:1px solid var(--g200)}
+.ch{padding:14px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ct2{font-size:14px;font-weight:600;color:var(--g800)}
+.cb{padding:18px}
+/* stats */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.sc{background:#fff;border-radius:var(--r14);padding:14px 18px;border:1px solid var(--g200);box-shadow:var(--sh)}
+.sl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g500);margin-bottom:3px}
+.sv{font-size:26px;font-weight:700;color:var(--g900)}
+.ss{font-size:11px;color:var(--g500);margin-top:1px}
+.sc.bl{border-left:4px solid var(--p)}.sc.gn{border-left:4px solid var(--g)}.sc.yw{border-left:4px solid var(--w)}.sc.rd{border-left:4px solid var(--r)}.sc.cy{border-left:4px solid var(--i)}
+/* forms */
+.fg{margin-bottom:14px}
+.fr{display:grid;gap:14px;margin-bottom:14px}
+.fr2{grid-template-columns:1fr 1fr}
+.fr3{grid-template-columns:1fr 1fr 1fr}
+label{display:block;font-size:11px;font-weight:600;color:var(--g700);margin-bottom:4px}
+label .rq{color:var(--r);margin-left:2px}
+input,select,textarea{width:100%;padding:7px 11px;border:1px solid var(--g300);border-radius:var(--r6);font-size:13px;color:var(--g800);background:#fff;transition:.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:72px}
+.hint{font-size:11px;color:var(--g400);margin-top:2px}
+/* tables */
+.tw{overflow-x:auto;border-radius:var(--r6)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--g50);padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g500);border-bottom:2px solid var(--g200)}
+td{padding:11px 13px;border-bottom:1px solid var(--g100);vertical-align:middle}
+tr:hover td{background:var(--g50)}
+tr:last-child td{border-bottom:none}
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-bl{background:#dbeafe;color:#1e40af}.b-gn{background:#d1fae5;color:#065f46}.b-yw{background:#fef3c7;color:#92400e}.b-rd{background:#fee2e2;color:#991b1b}.b-gr{background:var(--g100);color:var(--g600)}.b-pu{background:#ede9fe;color:#5b21b6}.b-cy{background:#cffafe;color:#155e75}
+/* modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:.2s}
+.mo.open{opacity:1;pointer-events:all}
+.mb{background:#fff;border-radius:var(--r14);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mb.lg{max-width:860px}
+.mh{padding:18px 22px 14px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.mh h3{font-size:15px;font-weight:700}
+.mbody{padding:22px}
+.mf{padding:14px 22px;border-top:1px solid var(--g200);display:flex;justify-content:flex-end;gap:8px;background:var(--g50)}
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--g200);margin-bottom:18px;overflow-x:auto}
+.tab{padding:9px 15px;font-size:13px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:.15s}
+.tab.active{color:var(--p);border-bottom-color:var(--p);font-weight:600}
+/* alerts */
+.al{padding:11px 15px;border-radius:var(--r6);font-size:13px;margin-bottom:14px;display:flex;gap:9px;align-items:flex-start}
+.al-i{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.al-s{background:#d1fae5;border:1px solid #6ee7b7;color:#065f46}
+.al-w{background:#fef3c7;border:1px solid #fcd34d;color:#92400e}
+.al-r{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b}
+/* empty */
+.es{text-align:center;padding:50px 20px;color:var(--g400)}
+.es .ei{font-size:44px;margin-bottom:10px}
+.es h3{font-size:15px;font-weight:600;color:var(--g600);margin-bottom:5px}
+.es p{font-size:13px;margin-bottom:14px}
+/* chips */
+.cc{display:flex;flex-wrap:wrap;gap:5px;padding:5px 8px;border:1px solid var(--g300);border-radius:var(--r6);min-height:38px;cursor:text}
+.cc:focus-within{border-color:var(--p);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.chip{display:inline-flex;align-items:center;gap:3px;background:var(--pl);color:var(--p);padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
+.chip button{background:none;border:none;cursor:pointer;color:var(--p);font-size:13px;line-height:1}
+.chi{border:none;outline:none;font-size:13px;flex:1;min-width:80px;background:none}
+/* range */
+.rw{display:flex;align-items:center;gap:8px}
+input[type=range]{padding:0;cursor:pointer}
+.rv{font-size:13px;font-weight:700;color:var(--p);min-width:34px;text-align:right}
+/* progress */
+.pb{height:7px;background:var(--g200);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px;transition:.3s}
+/* sem */
+.sem{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.s-g{background:var(--g)}.s-y{background:var(--w)}.s-r{background:var(--r)}
+/* toast */
+#toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--g800);color:#fff;padding:10px 18px;border-radius:var(--r10);font-size:13px;font-weight:500;box-shadow:var(--sh2);animation:slideIn .25s ease;max-width:320px}
+.toast.ok{background:var(--g)}.toast.err{background:var(--r)}.toast.warn{background:var(--w)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+/* overlay */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:199;display:none}
+.ovl.show{display:block}
+/* utils */
+.flex{display:flex}.ic{align-items:center}.jb{justify-content:space-between}.g2{gap:8px}.g3{gap:12px}.g4{gap:16px}
+.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}.mb2{margin-bottom:8px}.mb3{margin-bottom:12px}.mb4{margin-bottom:16px}
+.tsm{font-size:12px}.txs{font-size:11px}.tgr{color:var(--g500)}.tb{font-weight:700}.tp{color:var(--p)}
+.wf{width:100%}.dn{display:none!important}
+.div{border:none;border-top:1px solid var(--g200);margin:14px 0}
+/* responsive */
+@media(max-width:768px){#sb{position:fixed;left:-240px;top:0;bottom:0}#sb.open{left:0}#mt{display:flex}#ct{padding:14px}.fr2,.fr3{grid-template-columns:1fr}}
+@media print{#sb,#tb,#toast-wrap,.no-print{display:none!important}#ct{padding:0}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="toast-wrap"></div>
+<div id="ovl" class="ovl" onclick="closeSB()"></div>
+<div id="app">
+<nav id="sb">
+  <div class="sb-logo">
+    <h2 id="sb-empresa">👥 RRHH Pro</h2>
+    <p id="sb-ruc">Sistema de Selección de Personal</p>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-sec">General</div>
+    <div class="ni active" data-p="dashboard" onclick="go('dashboard')"><span class="ic">🏠</span>Dashboard</div>
+    <div class="nav-sec">Configuración</div>
+    <div class="ni" data-p="config" onclick="go('config')"><span class="ic">⚙️</span>Empresa &amp; GitHub</div>
+    <div class="ni" data-p="perfiles" onclick="go('perfiles')"><span class="ic">📋</span>Perfiles de Cargo</div>
+    <div class="nav-sec">Proceso</div>
+    <div class="ni" data-p="convocatorias" onclick="go('convocatorias')"><span class="ic">📢</span>Convocatorias</div>
+    <div class="ni" data-p="candidatos" onclick="go('candidatos')"><span class="ic">👤</span>Candidatos</div>
+    <div class="ni" data-p="presel" onclick="go('presel')"><span class="ic">🔍</span>Preselección</div>
+    <div class="ni" data-p="seleccion" onclick="go('seleccion')"><span class="ic">✅</span>Selección</div>
+    <div class="ni" data-p="entrevistas" onclick="go('entrevistas')"><span class="ic">🎤</span>Entrevistas</div>
+    <div class="nav-sec">Resultados</div>
+    <div class="ni" data-p="informe" onclick="go('informe')"><span class="ic">📄</span>Informe Final</div>
+  </div>
+</nav>
+<div id="main">
+  <div id="tb">
+    <button class="bti" id="mt" onclick="toggleSB()">☰</button>
+    <h1 id="pt">Dashboard</h1>
+    <span id="sync-status" class="sync-off">⬤ Local</span>
+    <div class="flex g2" id="tb-act"></div>
+  </div>
+  <div id="ct"></div>
+</div>
+</div>
+<div id="modal-ov" class="mo" onclick="closeMOv(event)">
+  <div class="mb" id="modal-box" onclick="event.stopPropagation()">
+    <div class="mh"><h3 id="modal-t">—</h3><button class="bti" onclick="closeM()">✕</button></div>
+    <div class="mbody" id="modal-b"></div>
+    <div class="mf" id="modal-f"></div>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, type='', ms=3000){
+  const d=document.createElement('div');
+  d.className='toast'+(type?' '+type:'');
+  d.textContent=msg;
+  document.getElementById('toast-wrap').appendChild(d);
+  setTimeout(()=>d.remove(), ms);
+}
+
+// ═══════════════════════════════════════════════
+// CONFIG & DB LAYER
+// ═══════════════════════════════════════════════
+const CFG_KEY='rrhh_config';
+function getConfig(){
+  try{ return JSON.parse(localStorage.getItem(CFG_KEY)||'{}') }catch(e){return {}}
+}
+function saveConfig(c){ localStorage.setItem(CFG_KEY,JSON.stringify(c)); updateSBLogo(); }
+
+const TABLES=['perfiles','convocatorias','candidatos'];
+const DB={
+  _cache:{},
+  get(t){
+    if(this._cache[t]) return this._cache[t];
+    try{ this._cache[t]=JSON.parse(localStorage.getItem('rrhh_'+t)||'[]'); }catch(e){this._cache[t]=[];}
+    return this._cache[t];
+  },
+  set(t,d){ this._cache[t]=d; localStorage.setItem('rrhh_'+t,JSON.stringify(d)); scheduleSync(t); },
+  perfiles(){ return this.get('perfiles'); },
+  convocatorias(){ return this.get('convocatorias'); },
+  candidatos(){ return this.get('candidatos'); },
+  savePerfiles(d){ this.set('perfiles',d); },
+  saveConvocatorias(d){ this.set('convocatorias',d); },
+  saveCandidatos(d){ this.set('candidatos',d); },
+};
+
+// ═══════════════════════════════════════════════
+// GITHUB SYNC
+// ═══════════════════════════════════════════════
+let syncTimers={}, fileSHAs={}, syncState='off';
+const GH_API='https://api.github.com';
+
+function ghHeaders(){
+  const cfg=getConfig();
+  return {'Authorization':'token '+cfg.ghToken,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
+}
+function ghPath(cfg,t){ return `${GH_API}/repos/${cfg.ghOwner}/${cfg.ghRepo}/contents/rrhh_data/${t}.json`; }
+
+function setSyncState(s,msg){
+  syncState=s;
+  const el=document.getElementById('sync-status');
+  if(!el) return;
+  el.className='sync-'+s;
+  const labels={ok:'✓ Sincronizado',ing:'↻ Sincronizando…',err:'⚠ Error sync',off:'⬤ Local'};
+  el.textContent=labels[s]||msg||s;
+}
+
+function scheduleSync(table){
+  const cfg=getConfig();
+  if(!cfg.ghToken||!cfg.ghOwner||!cfg.ghRepo) return;
+  clearTimeout(syncTimers[table]);
+  setSyncState('ing');
+  syncTimers[table]=setTimeout(()=>pushToGH(table), 800);
+}
+
+async function pushToGH(table){
+  const cfg=getConfig();
+  if(!cfg.ghToken||!cfg.ghOwner||!cfg.ghRepo){setSyncState('off');return;}
+  try{
+    const data=DB.get(table);
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+    const sha=fileSHAs[table];
+    const body={message:`update ${table} ${new Date().toISOString()}`,content};
+    if(sha) body.sha=sha;
+    const res=await fetch(ghPath(cfg,table),{method:'PUT',headers:ghHeaders(),body:JSON.stringify(body)});
+    if(res.ok){
+      const json=await res.json();
+      fileSHAs[table]=json.content?.sha;
+      setSyncState('ok');
+    } else {
+      const err=await res.json();
+      console.error('GH push error',err);
+      setSyncState('err');
+      toast('Error al sincronizar con GitHub: '+err.message,'err');
+    }
+  }catch(e){ setSyncState('err'); toast('Sin conexión a GitHub','err'); }
+}
+
+async function pullFromGH(){
+  const cfg=getConfig();
+  if(!cfg.ghToken||!cfg.ghOwner||!cfg.ghRepo) return false;
+  setSyncState('ing');
+  let loaded=0;
+  for(const t of TABLES){
+    try{
+      const res=await fetch(ghPath(cfg,t),{headers:ghHeaders()});
+      if(res.ok){
+        const json=await res.json();
+        fileSHAs[t]=json.sha;
+        const raw=decodeURIComponent(escape(atob(json.content.replace(/\n/g,''))));
+        const data=JSON.parse(raw);
+        localStorage.setItem('rrhh_'+t,JSON.stringify(data));
+        DB._cache[t]=data;
+        loaded++;
+      } else if(res.status===404){
+        // file doesn't exist yet — push current local data
+        await pushToGH(t);
+      }
+    }catch(e){ console.error('pull error',t,e); }
+  }
+  setSyncState(loaded>0?'ok':'off');
+  return loaded>0;
+}
+
+async function testGHConnection(){
+  const cfg=getConfig();
+  if(!cfg.ghToken||!cfg.ghOwner||!cfg.ghRepo){toast('Completa los datos de GitHub primero','warn');return;}
+  setSyncState('ing');
+  try{
+    const res=await fetch(`${GH_API}/repos/${cfg.ghOwner}/${cfg.ghRepo}`,{headers:ghHeaders()});
+    if(res.ok){ toast('✓ Conexión exitosa con GitHub','ok'); setSyncState('ok'); }
+    else { toast('Error: verifica token y repositorio','err'); setSyncState('err'); }
+  }catch(e){ toast('Sin conexión a internet','err'); setSyncState('err'); }
+}
+
+async function syncAllNow(){
+  setSyncState('ing');
+  const pulled=await pullFromGH();
+  if(pulled){ toast('✓ Datos cargados desde GitHub','ok'); go(curPage); }
+  else { for(const t of TABLES) await pushToGH(t); toast('✓ Datos subidos a GitHub','ok'); }
+}
+
+// ═══════════════════════════════════════════════
+// BACKUP / RESTORE
+// ═══════════════════════════════════════════════
+function exportBackup(){
+  const data={perfiles:DB.perfiles(),convocatorias:DB.convocatorias(),candidatos:DB.candidatos(),config:getConfig(),exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='rrhh_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  toast('✓ Backup descargado','ok');
+}
+
+function importBackup(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        if(d.perfiles) DB.savePerfiles(d.perfiles);
+        if(d.convocatorias) DB.saveConvocatorias(d.convocatorias);
+        if(d.candidatos) DB.saveCandidatos(d.candidatos);
+        toast('✓ Datos restaurados','ok');
+        go(curPage);
+      }catch(err){ toast('Archivo inválido','err'); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7) }
+function today(){ return new Date().toISOString().split('T')[0] }
+function fmtDate(d){ if(!d)return '—'; try{return new Date(d+'T12:00:00').toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'})}catch(e){return d} }
+function fmtMoney(n){ return n!=null&&n!==''?'$'+Number(n).toLocaleString('es-EC'):'—' }
+function scoreColor(s){ return s>=75?'var(--g)':s>=50?'var(--w)':'var(--r)' }
+function scoreCls(s){ return s>=75?'b-gn':s>=50?'b-yw':'b-rd' }
+function semCls(s){ return s>=75?'s-g':s>=50?'s-y':'s-r' }
+const EL={'postulado':'Postulado','preseleccionado':'Preseleccionado','descartado_pre':'Descartado','en_seleccion':'En Selección','descartado_sel':'Desc. Selec.','en_entrevista':'En Entrevista','finalista':'Finalista','seleccionado':'Seleccionado','reserva':'Reserva','descartado_final':'Desc. Final'};
+const EB={'postulado':'b-gr','preseleccionado':'b-bl','descartado_pre':'b-rd','en_seleccion':'b-cy','descartado_sel':'b-rd','en_entrevista':'b-pu','finalista':'b-yw','seleccionado':'b-gn','reserva':'b-bl','descartado_final':'b-rd'};
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let curPage='dashboard';
+const PAGE_TITLES={dashboard:'Dashboard',config:'Empresa & GitHub',perfiles:'Perfiles de Cargo',convocatorias:'Convocatorias',candidatos:'Candidatos',presel:'Preselección',seleccion:'Selección',entrevistas:'Entrevistas',informe:'Informe Final'};
+
+function go(page){
+  curPage=page;
+  document.querySelectorAll('.ni').forEach(el=>el.classList.toggle('active',el.dataset.p===page));
+  document.getElementById('pt').textContent=PAGE_TITLES[page]||page;
+  document.getElementById('tb-act').innerHTML='';
+  const fns={dashboard:pgDashboard,config:pgConfig,perfiles:pgPerfiles,convocatorias:pgConvocatorias,candidatos:pgCandidatos,presel:pgPresel,seleccion:pgSeleccion,entrevistas:pgEntrevistas,informe:pgInforme};
+  if(fns[page]) fns[page]();
+  closeSB();
+}
+function toggleSB(){ document.getElementById('sb').classList.toggle('open'); document.getElementById('ovl').classList.toggle('show'); }
+function closeSB(){ document.getElementById('sb').classList.remove('open'); document.getElementById('ovl').classList.remove('show'); }
+function updateSBLogo(){ const c=getConfig(); const el=document.getElementById('sb-empresa'); const el2=document.getElementById('sb-ruc'); if(el&&c.empresa) el.textContent='👥 '+c.empresa; if(el2&&c.ruc) el2.textContent='RUC: '+c.ruc; }
+
+// ═══════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════
+function openM(title,body,footer='',lg=false){
+  document.getElementById('modal-t').textContent=title;
+  document.getElementById('modal-b').innerHTML=body;
+  document.getElementById('modal-f').innerHTML=footer;
+  document.getElementById('modal-box').className='mb'+(lg?' lg':'');
+  document.getElementById('modal-ov').classList.add('open');
+}
+function closeM(){ document.getElementById('modal-ov').classList.remove('open'); }
+function closeMOv(e){ if(e.target===document.getElementById('modal-ov')) closeM(); }
+
+// ═══════════════════════════════════════════════
+// CHIPS
+// ═══════════════════════════════════════════════
+function initChip(cid,iid,hid){
+  const c=document.getElementById(cid), inp=document.getElementById(iid); if(!c||!inp) return;
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===','){e.preventDefault();const v=this.value.trim().replace(/,$/,'');if(v){addChip(cid,hid,v);this.value=''}}});
+  c.addEventListener('click',()=>inp.focus());
+}
+function getChips(hid){ try{return JSON.parse(document.getElementById(hid)?.value||'[]')}catch(e){return []} }
+function setChips(cid,hid,arr){ const h=document.getElementById(hid); if(!h)return; h.value=JSON.stringify(arr); renderChips(cid,hid,arr); }
+function addChip(cid,hid,val){ const a=getChips(hid); if(!a.includes(val)){a.push(val);setChips(cid,hid,a);} }
+function removeChip(cid,hid,val){ setChips(cid,hid,getChips(hid).filter(v=>v!==val)); }
+function renderChips(cid,hid,arr){
+  const c=document.getElementById(cid); if(!c)return;
+  const iid=cid.replace('_cc','_ci');
+  c.innerHTML=arr.map(v=>`<span class="chip">${v}<button type="button" onclick="removeChip('${cid}','${hid}','${v.replace(/'/g,"\\'")}')">×</button></span>`).join('')+`<input type="text" class="chi" id="${iid}" placeholder="Escribe y Enter..."><input type="hidden" id="${hid}" value='${JSON.stringify(arr)}'>`;
+  initChip(cid,iid,hid);
+}
+function chips(cid,hid,arr){ setTimeout(()=>{const c=document.getElementById(cid);if(c)c.innerHTML=`<input type="text" class="chi" id="${cid.replace('_cc','_ci')}" placeholder="Escribe y Enter..."><input type="hidden" id="${hid}" value="[]">`;setChips(cid,hid,arr||[]);},30); }
+
+// tab switcher
+function swTab(prefix,n){ for(let i=0;i<8;i++){const t=document.getElementById(prefix+'_t'+i),p=document.getElementById(prefix+'_p'+i);if(t)t.classList.toggle('active',i===n);if(p)p.classList.toggle('dn',i!==n);} }
+// ═══════════════════════════════════════════════
+// PAGE: CONFIG
+// ═══════════════════════════════════════════════
+function pgConfig(){
+  const c=getConfig();
+  document.getElementById('ct').innerHTML=`
+  <div class="tabs"><div class="tab active" onclick="swTab('cfg',0)">🏢 Empresa</div><div class="tab" onclick="swTab('cfg',1)">🐙 GitHub Sync</div><div class="tab" onclick="swTab('cfg',2)">💾 Backup</div></div>
+  <div id="cfg_p0">
+    <div class="card"><div class="ch"><span class="ct2">Datos de la Empresa</span></div><div class="cb">
+      <div class="fr fr2">
+        <div class="fg"><label>Nombre de la Empresa<span class="rq">*</span></label><input id="cf_emp" value="${c.empresa||''}"></div>
+        <div class="fg"><label>RUC / Identificación</label><input id="cf_ruc" value="${c.ruc||''}"></div>
+      </div>
+      <div class="fr fr2">
+        <div class="fg"><label>Dirección</label><input id="cf_dir" value="${c.direccion||''}"></div>
+        <div class="fg"><label>Teléfono</label><input id="cf_tel" value="${c.telefono||''}"></div>
+      </div>
+      <div class="fr fr2">
+        <div class="fg"><label>Director de RRHH (firma documentos)</label><input id="cf_dir_rrhh" value="${c.dirRRHH||''}"></div>
+        <div class="fg"><label>Representante Legal (firma documentos)</label><input id="cf_rep" value="${c.repLegal||''}"></div>
+      </div>
+      <div class="fg"><label>Ciudad</label><input id="cf_ciu" value="${c.ciudad||''}" style="max-width:220px"></div>
+      <button class="btn bp" onclick="saveCfgEmpresa()">💾 Guardar Datos</button>
+    </div></div>
+  </div>
+  <div id="cfg_p1" class="dn">
+    <div class="al al-i">GitHub actúa como base de datos en la nube gratuita. Tus datos se sincronizan automáticamente en todos los dispositivos donde abras este sistema.</div>
+    <div class="card mb3"><div class="ch"><span class="ct2">Configurar GitHub</span></div><div class="cb">
+      <div class="fg"><label>Usuario u Organización GitHub</label><input id="cf_own" value="${c.ghOwner||''}" placeholder="tu-usuario"></div>
+      <div class="fg"><label>Nombre del Repositorio (puede ser privado)</label><input id="cf_repo" value="${c.ghRepo||''}" placeholder="rrhh-datos"></div>
+      <div class="fg"><label>Personal Access Token <span class="hint">(Settings → Developer settings → Tokens → Classic → scope: repo)</span></label><input id="cf_tok" type="password" value="${c.ghToken||''}" placeholder="ghp_xxxxxxxxxxxx"></div>
+      <div class="flex g2 mt3">
+        <button class="btn bp" onclick="saveCfgGH()">💾 Guardar</button>
+        <button class="btn bo" onclick="testGHConnection()">🔌 Probar conexión</button>
+        <button class="btn bo" onclick="syncAllNow()">🔄 Sincronizar ahora</button>
+      </div>
+    </div></div>
+    <div class="card"><div class="ch"><span class="ct2">Instrucciones paso a paso</span></div><div class="cb">
+      <ol style="padding-left:18px;line-height:2">
+        <li>Ve a <strong>github.com</strong> → crea una cuenta si no tienes</li>
+        <li>Crea un repositorio nuevo (puede ser <strong>privado</strong>), llámalo <code>rrhh-datos</code></li>
+        <li>Ve a <strong>Settings → Developer settings → Personal access tokens → Tokens (classic)</strong></li>
+        <li>Genera un token con scope <strong>repo</strong> completo</li>
+        <li>Pega el token aquí y guarda</li>
+        <li>Haz clic en <strong>Sincronizar ahora</strong> — tus datos subirán automáticamente</li>
+      </ol>
+      <div class="al al-s mt3">Una vez configurado, cada vez que guardes un candidato, perfil o convocatoria, se sincroniza solo en ~1 segundo.</div>
+    </div></div>
+  </div>
+  <div id="cfg_p2" class="dn">
+    <div class="card"><div class="ch"><span class="ct2">Exportar e Importar</span></div><div class="cb">
+      <p class="tgr tsm mb3">El backup guarda todos tus datos en un archivo JSON que puedes restaurar en cualquier momento.</p>
+      <div class="flex g3">
+        <button class="btn bp" onclick="exportBackup()">⬇️ Descargar Backup</button>
+        <button class="btn bo" onclick="importBackup()">⬆️ Restaurar Backup</button>
+      </div>
+    </div></div>
+  </div>`;
+  // set tabs active
+  document.querySelectorAll('#ct .tab').forEach((t,i)=>t.onclick=()=>swTab('cfg',i));
+}
+
+function saveCfgEmpresa(){
+  const c=getConfig();
+  c.empresa=document.getElementById('cf_emp')?.value.trim();
+  c.ruc=document.getElementById('cf_ruc')?.value.trim();
+  c.direccion=document.getElementById('cf_dir')?.value.trim();
+  c.telefono=document.getElementById('cf_tel')?.value.trim();
+  c.dirRRHH=document.getElementById('cf_dir_rrhh')?.value.trim();
+  c.repLegal=document.getElementById('cf_rep')?.value.trim();
+  c.ciudad=document.getElementById('cf_ciu')?.value.trim();
+  saveConfig(c); toast('✓ Datos de empresa guardados','ok');
+}
+
+function saveCfgGH(){
+  const c=getConfig();
+  c.ghOwner=document.getElementById('cf_own')?.value.trim();
+  c.ghRepo=document.getElementById('cf_repo')?.value.trim();
+  c.ghToken=document.getElementById('cf_tok')?.value.trim();
+  saveConfig(c); toast('✓ Config GitHub guardada','ok');
+}
+
+// ═══════════════════════════════════════════════
+// PAGE: DASHBOARD
+// ═══════════════════════════════════════════════
+function pgDashboard(){
+  const convs=DB.convocatorias(), cands=DB.candidatos(), perfs=DB.perfiles();
+  const activas=convs.filter(c=>c.estado==='activa').length;
+  const enProc=cands.filter(c=>['preseleccionado','en_seleccion','en_entrevista','finalista'].includes(c.etapa)).length;
+  const sels=cands.filter(c=>c.etapa==='seleccionado').length;
+  const rows=convs.slice(0,8).map(conv=>{
+    const n=cands.filter(c=>c.convocatoriaId===conv.id).length;
+    const p=perfs.find(x=>x.id===conv.perfilId);
+    return `<tr><td><strong>${conv.titulo}</strong><br><span class="tgr txs">${p?p.area:'—'}</span></td><td>${eBadge(conv.estado)}</td><td>${n}</td><td>${fmtDate(conv.fechaCierre)}</td></tr>`;
+  }).join('');
+  document.getElementById('ct').innerHTML=`
+    <div class="sg">
+      <div class="sc bl"><div class="sl">Conv. Activas</div><div class="sv">${activas}</div><div class="ss">de ${convs.length} total</div></div>
+      <div class="sc cy"><div class="sl">Total Candidatos</div><div class="sv">${cands.length}</div></div>
+      <div class="sc yw"><div class="sl">En Proceso</div><div class="sv">${enProc}</div></div>
+      <div class="sc gn"><div class="sl">Seleccionados</div><div class="sv">${sels}</div></div>
+      <div class="sc bl"><div class="sl">Perfiles Guardados</div><div class="sv">${perfs.length}</div></div>
+    </div>
+    ${convs.length===0?`<div class="es"><div class="ei">🚀</div><h3>¡Bienvenido!</h3><p>Empieza en <strong>Empresa & GitHub</strong> para configurar tus datos, luego crea tu primer Perfil de Cargo.</p><button class="btn bp" onclick="go('config')">⚙️ Configurar</button></div>`
+    :`<div class="card"><div class="ch"><span class="ct2">Convocatorias Recientes</span><button class="btn bo bs" onclick="go('convocatorias')">Ver todas</button></div><div class="tw"><table><thead><tr><th>Cargo</th><th>Estado</th><th>Candidatos</th><th>Cierre</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}`;
+}
+function eBadge(e){ const m={activa:'b-gn',cerrada:'b-gr',pausada:'b-yw'}; const l={activa:'Activa',cerrada:'Cerrada',pausada:'Pausada'}; return `<span class="badge ${m[e]||'b-gr'}">${l[e]||e}</span>`; }
+// ═══════════════════════════════════════════════
+// PAGE: PERFILES DE CARGO
+// ═══════════════════════════════════════════════
+function pgPerfiles(){
+  const perfs=DB.perfiles();
+  document.getElementById('tb-act').innerHTML=`<button class="btn bp bs" onclick="modalPerfil()">+ Nuevo Perfil</button>`;
+  if(!perfs.length){ document.getElementById('ct').innerHTML=`<div class="es"><div class="ei">📋</div><h3>Sin perfiles</h3><p>Los perfiles se reusan en múltiples convocatorias.</p><button class="btn bp" onclick="modalPerfil()">+ Crear perfil</button></div>`; return; }
+  const cards=perfs.map(p=>{
+    const nc=DB.convocatorias().filter(c=>c.perfilId===p.id).length;
+    return `<div class="card mb3">
+      <div class="cb">
+        <div class="flex jb ic" style="flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="flex ic g2 mb2"><strong style="font-size:15px">${p.nombre}</strong><span class="badge b-bl">${p.nivel||'—'}</span>${p.modalidad?`<span class="badge b-gr">${p.modalidad}</span>`:''}</div>
+            <div class="tsm tgr">${p.area||'—'} · ${fmtMoney(p.salarioMin)} – ${fmtMoney(p.salarioMax)} · ${nc} convocatoria${nc!==1?'s':''}</div>
+          </div>
+          <div class="flex g2">
+            <button class="btn bo bxs" onclick="modalPerfil('${p.id}')">✏️ Editar</button>
+            <button class="btn bo bxs" onclick="clonarPerfil('${p.id}')">📋 Clonar</button>
+            <button class="btn bo bxs" onclick="pdfManual('${p.id}')">📄 Manual PDF</button>
+            <button class="btn bo bxs" onclick="delPerfil('${p.id}')">🗑️</button>
+          </div>
+        </div>
+        ${p.funciones&&p.funciones.length?`<div class="mt3 tsm tgr">Funciones: ${p.funciones.slice(0,3).join(' · ')}${p.funciones.length>3?' · …':''}</div>`:''}
+        ${p.competencias&&p.competencias.length?`<div class="mt2 flex g2" style="flex-wrap:wrap">${p.competencias.filter(c=>c.nombre).map(c=>`<span class="badge b-gr">${c.nombre} <strong>${c.peso}%</strong></span>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('ct').innerHTML=`<div class="flex jb ic mb3 tgr tsm"><span>${perfs.length} perfil(es)</span></div>${cards}`;
+}
+
+function modalPerfil(id=null){
+  const p=id?DB.perfiles().find(x=>x.id===id):null;
+  const v=p||{nombre:'',area:'',nivel:'Operativo',salarioMin:'',salarioMax:'',modalidad:'Presencial',jornada:'Tiempo completo',descripcion:'',educacionNivel:'Tercer Nivel',educacionCampo:'',expAnios:0,expArea:'',funciones:[],habilidades:[],idiomas:['Español'],software:[],competencias:[{nombre:'Orientación al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicación',peso:25},{nombre:'Proactividad',peso:25}]};
+  const niv=['Bachillerato','Técnico','Tecnólogo','Tercer Nivel','Cuarto Nivel'];
+  const compHtml=(v.competencias||[]).slice(0,4).map((c,i)=>`<div class="fr fr2" style="align-items:center"><input id="cn_${i}" value="${c.nombre||''}" placeholder="Competencia ${i+1}"><div class="rw"><input type="range" id="cp_${i}" min="0" max="100" value="${c.peso||25}" oninput="document.getElementById('cv_${i}').textContent=this.value+'%'"><span class="rv" id="cv_${i}">${c.peso||25}%</span></div></div>`).join('');
+  openM(id?'Editar Perfil':'Nuevo Perfil de Cargo',`
+    <div class="tabs"><div class="tab active" id="pt_t0" onclick="swTab('pt',0)">General</div><div class="tab" id="pt_t1" onclick="swTab('pt',1)">Requisitos</div><div class="tab" id="pt_t2" onclick="swTab('pt',2)">Competencias</div></div>
+    <div id="pt_p0">
+      <div class="fr fr2"><div class="fg"><label>Cargo<span class="rq">*</span></label><input id="pf_n" value="${v.nombre}"></div><div class="fg"><label>Área</label><input id="pf_a" value="${v.area}"></div></div>
+      <div class="fr fr3"><div class="fg"><label>Nivel</label><select id="pf_nv"><option ${v.nivel==='Directivo'?'selected':''}>Directivo</option><option ${v.nivel==='Jefatura'?'selected':''}>Jefatura</option><option ${v.nivel==='Técnico'?'selected':''}>Técnico</option><option ${v.nivel==='Operativo'?'selected':''}>Operativo</option><option ${v.nivel==='Auxiliar'?'selected':''}>Auxiliar</option></select></div><div class="fg"><label>Salario Mín $</label><input id="pf_sm" type="number" value="${v.salarioMin}"></div><div class="fg"><label>Salario Máx $</label><input id="pf_sx" type="number" value="${v.salarioMax}"></div></div>
+      <div class="fr fr2"><div class="fg"><label>Modalidad</label><select id="pf_mo"><option ${v.modalidad==='Presencial'?'selected':''}>Presencial</option><option ${v.modalidad==='Remoto'?'selected':''}>Remoto</option><option ${v.modalidad==='Híbrido'?'selected':''}>Híbrido</option></select></div><div class="fg"><label>Jornada</label><select id="pf_jo"><option ${v.jornada==='Tiempo completo'?'selected':''}>Tiempo completo</option><option ${v.jornada==='Medio tiempo'?'selected':''}>Medio tiempo</option></select></div></div>
+      <div class="fg"><label>Descripción / Objetivo del Cargo</label><textarea id="pf_de" rows="3">${v.descripcion||''}</textarea></div>
+      <div class="fg"><label>Funciones Principales <span class="hint">(Enter para agregar)</span></label><div class="cc" id="fn_cc"></div></div>
+    </div>
+    <div id="pt_p1" class="dn">
+      <div class="fr fr2"><div class="fg"><label>Nivel Educativo Req.</label><select id="pf_en">${niv.map(n=>`<option ${v.educacionNivel===n?'selected':''}>${n}</option>`).join('')}</select></div><div class="fg"><label>Carrera / Campo</label><input id="pf_ec" value="${v.educacionCampo||''}"></div></div>
+      <div class="fr fr2"><div class="fg"><label>Experiencia mínima (años)</label><input id="pf_ea" type="number" min="0" value="${v.expAnios||0}"></div><div class="fg"><label>Área de experiencia</label><input id="pf_er" value="${v.expArea||''}"></div></div>
+      <div class="fg"><label>Habilidades</label><div class="cc" id="ha_cc"></div></div>
+      <div class="fg"><label>Idiomas</label><div class="cc" id="id_cc"></div></div>
+      <div class="fg"><label>Software / Herramientas</label><div class="cc" id="so_cc"></div></div>
+    </div>
+    <div id="pt_p2" class="dn">
+      <div class="al al-i">Define competencias y su peso. La suma debe ser 100%.</div>
+      ${compHtml}
+      <div class="mt2 tsm tgr" id="peso_info"></div>
+    </div>`,
+    `<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bp" onclick="savePerfil('${id||''}')">💾 Guardar Perfil</button>`,true);
+  setTimeout(()=>{
+    chips('fn_cc','fn_h',v.funciones||[]);
+    chips('ha_cc','ha_h',v.habilidades||[]);
+    chips('id_cc','id_h',v.idiomas||['Español']);
+    chips('so_cc','so_h',v.software||[]);
+  },50);
+}
+
+function savePerfil(id){
+  const g=i=>document.getElementById(i)?.value||'';
+  const comps=[0,1,2,3].map(i=>({nombre:g(`cn_${i}`).trim(),peso:parseInt(g(`cp_${i}`)||0)})).filter(c=>c.nombre);
+  const p={id:id||uid(),nombre:g('pf_n').trim(),area:g('pf_a').trim(),nivel:g('pf_nv'),salarioMin:g('pf_sm'),salarioMax:g('pf_sx'),modalidad:g('pf_mo'),jornada:g('pf_jo'),descripcion:g('pf_de').trim(),educacionNivel:g('pf_en'),educacionCampo:g('pf_ec').trim(),expAnios:parseInt(g('pf_ea')||0),expArea:g('pf_er').trim(),funciones:getChips('fn_h'),habilidades:getChips('ha_h'),idiomas:getChips('id_h'),software:getChips('so_h'),competencias:comps,actualizadoEn:today(),creadoEn:id?(DB.perfiles().find(x=>x.id===id)||{}).creadoEn||today():today()};
+  if(!p.nombre){toast('El nombre del cargo es requerido','err');return;}
+  DB.savePerfiles([...DB.perfiles().filter(x=>x.id!==p.id),p]);
+  closeM(); toast('✓ Perfil guardado','ok'); pgPerfiles();
+}
+function clonarPerfil(id){ const p=DB.perfiles().find(x=>x.id===id); if(!p)return; DB.savePerfiles([...DB.perfiles(),{...p,id:uid(),nombre:p.nombre+' (Copia)',creadoEn:today()}]); toast('Perfil clonado','ok'); pgPerfiles(); }
+function delPerfil(id){ if(!confirm('¿Eliminar perfil?'))return; DB.savePerfiles(DB.perfiles().filter(x=>x.id!==id)); pgPerfiles(); }
+// ═══════════════════════════════════════════════
+// PDF: MANUAL DE FUNCIONES
+// ═══════════════════════════════════════════════
+function pdfManual(perfilId, candId=null){
+  const p=DB.perfiles().find(x=>x.id===perfilId); if(!p){toast('Perfil no encontrado','err');return;}
+  const cfg=getConfig();
+  const cand=candId?DB.candidatos().find(x=>x.id===candId):null;
+  const empresa=cfg.empresa||'[NOMBRE DE LA EMPRESA]';
+  const ruc=cfg.ruc||'';
+  const dir=cfg.direccion||'';
+  const ciudad=cfg.ciudad||'';
+  const dirRRHH=cfg.dirRRHH||'_______________________________';
+  const repLegal=cfg.repLegal||'_______________________________';
+  const candNombre=cand?`${cand.nombres} ${cand.apellidos}`:'_______________________________';
+  const candCedula=cand?cand.cedula||'_______________':'_______________';
+  const fechaDoc=new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
+  const funHtml=(p.funciones||[]).map((f,i)=>`<tr><td style="width:40px;text-align:center;color:#555">${i+1}</td><td>${f}</td></tr>`).join('');
+  const compHtml=(p.competencias||[]).filter(c=>c.nombre).map(c=>`<tr><td>${c.nombre}</td><td style="text-align:center">${c.peso}%</td></tr>`).join('');
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Manual de Funciones — ${p.nombre}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;font-size:12px;color:#222;background:#fff;padding:0}
+    .page{width:21cm;min-height:29.7cm;margin:0 auto;padding:2cm 2.2cm;display:flex;flex-direction:column}
+    .header{border-bottom:3px solid #1e40af;padding-bottom:14px;margin-bottom:20px}
+    .header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .empresa-name{font-size:18px;font-weight:700;color:#1e40af}
+    .empresa-sub{font-size:11px;color:#555;margin-top:2px}
+    .doc-title{text-align:right}
+    .doc-title h1{font-size:16px;font-weight:700;color:#1e293b}
+    .doc-title .doc-num{font-size:11px;color:#888;margin-top:3px}
+    .badge-cargo{display:inline-block;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:4px 14px;border-radius:4px;font-weight:700;font-size:13px;margin-top:6px}
+    table.info{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px}
+    table.info td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top}
+    table.info td:first-child{background:#f8fafc;font-weight:600;width:35%;color:#334155}
+    .section-title{font-size:13px;font-weight:700;color:#1e40af;border-bottom:1px solid #bfdbfe;padding-bottom:5px;margin:18px 0 10px}
+    table.list{width:100%;border-collapse:collapse;font-size:12px}
+    table.list th{background:#f1f5f9;padding:6px 10px;text-align:left;font-size:11px;font-weight:700;border:1px solid #e2e8f0;color:#475569}
+    table.list td{padding:7px 10px;border:1px solid #e2e8f0;vertical-align:top}
+    table.list tr:nth-child(even) td{background:#f8fafc}
+    .firmas{margin-top:auto;padding-top:30px;border-top:1px solid #e2e8f0}
+    .firmas-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;margin-top:20px}
+    .firma-box{text-align:center}
+    .firma-line{border-bottom:1px solid #334155;margin-bottom:8px;height:50px}
+    .firma-name{font-weight:700;font-size:12px;color:#1e293b}
+    .firma-role{font-size:10px;color:#64748b;margin-top:2px}
+    .footer{margin-top:20px;font-size:10px;color:#94a3b8;text-align:center;border-top:1px solid #f1f5f9;padding-top:8px}
+    .chip-list{display:flex;flex-wrap:wrap;gap:5px}
+    .chip{display:inline-block;background:#eff6ff;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+    @media print{body{padding:0}.page{margin:0;padding:1.5cm 2cm;min-height:auto}}
+  </style></head><body>
+  <div class="page">
+    <div class="header">
+      <div class="header-top">
+        <div><div class="empresa-name">${empresa}</div><div class="empresa-sub">${ruc?'RUC: '+ruc:''}${dir?' · '+dir:''}</div></div>
+        <div class="doc-title"><h1>MANUAL DE FUNCIONES</h1><div class="doc-num">Fecha: ${fechaDoc} · Ciudad: ${ciudad||'—'}</div><div class="badge-cargo">${p.nombre}</div></div>
+      </div>
+    </div>
+
+    <div class="section-title">1. IDENTIFICACIÓN DEL CARGO</div>
+    <table class="info">
+      <tr><td>Denominación del Cargo</td><td><strong>${p.nombre}</strong></td></tr>
+      <tr><td>Área / Departamento</td><td>${p.area||'—'}</td></tr>
+      <tr><td>Nivel Jerárquico</td><td>${p.nivel||'—'}</td></tr>
+      <tr><td>Modalidad de Trabajo</td><td>${p.modalidad||'Presencial'}</td></tr>
+      <tr><td>Jornada Laboral</td><td>${p.jornada||'Tiempo completo'}</td></tr>
+      <tr><td>Remuneración Mensual</td><td>${fmtMoney(p.salarioMin)}${p.salarioMax?' – '+fmtMoney(p.salarioMax):''}</td></tr>
+      ${cand?`<tr><td>Colaborador Asignado</td><td><strong>${candNombre}</strong> · C.I.: ${candCedula}</td></tr>`:''}
+    </table>
+
+    ${p.descripcion?`<div class="section-title">2. OBJETIVO DEL CARGO</div><p style="font-size:12px;line-height:1.6;margin-bottom:10px">${p.descripcion}</p>`:''}
+
+    <div class="section-title">${p.descripcion?'3':'2'}. FUNCIONES PRINCIPALES</div>
+    ${funHtml?`<table class="list"><thead><tr><th>#</th><th>Función / Actividad</th></tr></thead><tbody>${funHtml}</tbody></table>`:'<p style="color:#888;font-style:italic">No se han definido funciones para este cargo.</p>'}
+
+    <div class="section-title">${p.descripcion?'4':'3'}. PERFIL Y REQUISITOS</div>
+    <table class="info">
+      <tr><td>Nivel Educativo Requerido</td><td>${p.educacionNivel||'—'}${p.educacionCampo?' en '+p.educacionCampo:''}</td></tr>
+      <tr><td>Experiencia Mínima</td><td>${p.expAnios||0} año(s)${p.expArea?' en '+p.expArea:''}</td></tr>
+      ${p.habilidades&&p.habilidades.length?`<tr><td>Habilidades</td><td><div class="chip-list">${p.habilidades.map(h=>`<span class="chip">${h}</span>`).join('')}</div></td></tr>`:''}
+      ${p.idiomas&&p.idiomas.length?`<tr><td>Idiomas</td><td><div class="chip-list">${p.idiomas.map(h=>`<span class="chip">${h}</span>`).join('')}</div></td></tr>`:''}
+      ${p.software&&p.software.length?`<tr><td>Software / Herramientas</td><td><div class="chip-list">${p.software.map(h=>`<span class="chip">${h}</span>`).join('')}</div></td></tr>`:''}
+    </table>
+
+    ${compHtml?`<div class="section-title">${p.descripcion?'5':'4'}. COMPETENCIAS CLAVE</div><table class="list"><thead><tr><th>Competencia</th><th style="width:80px;text-align:center">Peso (%)</th></tr></thead><tbody>${compHtml}</tbody></table>`:''}
+
+    <div class="firmas">
+      <p style="font-size:11px;color:#475569;margin-bottom:10px">En aceptación y conformidad con las funciones, responsabilidades y condiciones del presente cargo, firman las partes:</p>
+      <div class="firmas-grid">
+        <div class="firma-box"><div class="firma-line"></div><div class="firma-name">${candNombre}</div><div class="firma-role">Colaborador / Trabajador</div></div>
+        <div class="firma-box"><div class="firma-line"></div><div class="firma-name">${dirRRHH}</div><div class="firma-role">Director de RRHH</div></div>
+        <div class="firma-box"><div class="firma-line"></div><div class="firma-name">${repLegal}</div><div class="firma-role">Representante Legal / Gerencia</div></div>
+      </div>
+    </div>
+    <div class="footer">${empresa}${ruc?' · RUC '+ruc:''} · Documento generado el ${fechaDoc} · Confidencial</div>
+  </div>
+  <script>window.onload=()=>window.print()<\/script>
+  
+<div id="pwa-install-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1e40af;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;z-index:9998;font-size:13px">
+  <span>📱 Instalar RRHH Pro como app en este dispositivo</span>
+  <div style="display:flex;gap:8px">
+    <button onclick="installPWA()" style="background:#fff;color:#1e40af;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer">Instalar</button>
+    <button onclick="document.getElementById('pwa-install-bar').style.display='none'" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer">✕</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// PWA: Manifest dinámico + Service Worker
+// ═══════════════════════════════════════════════
+(function setupPWA(){
+  // Dynamic manifest
+  const manifest = {
+    name: "RRHH Pro — Selección de Personal",
+    short_name: "RRHH Pro",
+    description: "Sistema de selección de personal con preselección, entrevistas e informes",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#f8fafc",
+    theme_color: "#1e293b",
+    orientation: "any",
+    icons: [
+      { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231e40af'/><text x='96' y='130' font-size='100' text-anchor='middle' fill='white'>👥</text></svg>`), sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+      { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231e40af'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='white'>👥</text></svg>`), sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+
+  // Service Worker for offline support
+  if('serviceWorker' in navigator){
+    const swCode = `
+const CACHE = 'rrhh-pro-v1';
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if(e.request.method !== 'GET') return;
+  e.respondWith(caches.match(e.request).then(cached => {
+    const fresh = fetch(e.request).then(res => {
+      if(res && res.status === 200) {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return res;
+    }).catch(() => cached);
+    return cached || fresh;
+  }));
+});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl, {scope: '/'})
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  }
+
+  // PWA Install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwa-install-bar').style.display = 'flex';
+  });
+  window.installPWA = function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('pwa-install-bar').style.display='none'; });
+  };
+  window.addEventListener('appinstalled', ()=>{
+    document.getElementById('pwa-install-bar').style.display='none';
+    toast('✓ App instalada correctamente','ok');
+  });
+})();
+</script>
+</body></html>`);
+  win.document.close();
+}
+// ═══════════════════════════════════════════════
+// PAGE: CONVOCATORIAS
+// ═══════════════════════════════════════════════
+function pgConvocatorias(){
+  const convs=DB.convocatorias(), perfs=DB.perfiles();
+  document.getElementById('tb-act').innerHTML=`<button class="btn bp bs" onclick="modalConv()">+ Nueva Convocatoria</button>`;
+  if(!convs.length){ document.getElementById('ct').innerHTML=`<div class="es"><div class="ei">📢</div><h3>Sin convocatorias</h3>${perfs.length?`<button class="btn bp" onclick="modalConv()">+ Crear</button>`:`<p>Primero crea un Perfil de Cargo.</p><button class="btn bo" onclick="go('perfiles')">Ir a Perfiles</button>`}</div>`; return; }
+  const rows=convs.map(c=>{
+    const p=perfs.find(x=>x.id===c.perfilId);
+    const n=DB.candidatos().filter(x=>x.convocatoriaId===c.id).length;
+    return `<tr><td><strong>${c.titulo}</strong><br><span class="tgr txs">${p?p.area:'Sin perfil'} · ${c.vacantes} vacante(s)</span></td><td>${eBadge(c.estado)}</td><td>${fmtDate(c.fechaApertura)}</td><td>${fmtDate(c.fechaCierre)}</td><td><span class="badge b-bl">${n}</span></td><td><div class="flex g2"><button class="btn bo bxs" onclick="modalConv('${c.id}')">✏️</button><button class="btn bo bxs" onclick="toggleConv('${c.id}')">${c.estado==='activa'?'⏸️':'▶️'}</button><button class="btn bo bxs" onclick="delConv('${c.id}')">🗑️</button></div></td></tr>`;
+  }).join('');
+  document.getElementById('ct').innerHTML=`<div class="card"><div class="tw"><table><thead><tr><th>Cargo</th><th>Estado</th><th>Apertura</th><th>Cierre</th><th>Cands.</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function modalConv(id=null){
+  const perfs=DB.perfiles(); if(!perfs.length){toast('Crea un Perfil de Cargo primero','warn');return;}
+  const c=id?DB.convocatorias().find(x=>x.id===id):null;
+  const v=c||{titulo:'',perfilId:'',vacantes:1,estado:'activa',fechaApertura:today(),fechaCierre:'',obs:''};
+  const opts=perfs.map(p=>`<option value="${p.id}" ${v.perfilId===p.id?'selected':''}>${p.nombre} (${p.area||'Sin área'})</option>`).join('');
+  openM(id?'Editar Convocatoria':'Nueva Convocatoria',`
+    <div class="fg"><label>Perfil Base<span class="rq">*</span></label><select id="cv_p"><option value="">—</option>${opts}</select></div>
+    <div class="fg"><label>Título<span class="rq">*</span></label><input id="cv_t" value="${v.titulo}" placeholder="Ej: Vendedor — Sucursal Norte 2026"></div>
+    <div class="fr fr3"><div class="fg"><label>Vacantes</label><input id="cv_v" type="number" min="1" value="${v.vacantes}"></div><div class="fg"><label>Apertura</label><input id="cv_a" type="date" value="${v.fechaApertura}"></div><div class="fg"><label>Cierre</label><input id="cv_c" type="date" value="${v.fechaCierre||''}"></div></div>
+    <div class="fg"><label>Estado</label><select id="cv_e"><option value="activa" ${v.estado==='activa'?'selected':''}>Activa</option><option value="pausada" ${v.estado==='pausada'?'selected':''}>Pausada</option><option value="cerrada" ${v.estado==='cerrada'?'selected':''}>Cerrada</option></select></div>
+    <div class="fg"><label>Observaciones</label><textarea id="cv_o" rows="2">${v.obs||''}</textarea></div>`,
+    `<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bp" onclick="saveConv('${id||''}')">💾 Guardar</button>`);
+  setTimeout(()=>{const s=document.getElementById('cv_p'),t=document.getElementById('cv_t');if(s&&t)s.addEventListener('change',function(){const p=perfs.find(x=>x.id===this.value);if(p&&!t.value)t.value=p.nombre;});},50);
+}
+function saveConv(id){
+  const g=i=>document.getElementById(i)?.value||'';
+  const c={id:id||uid(),titulo:g('cv_t').trim(),perfilId:g('cv_p'),vacantes:parseInt(g('cv_v')||1),estado:g('cv_e'),fechaApertura:g('cv_a'),fechaCierre:g('cv_c'),obs:g('cv_o').trim(),creadoEn:id?(DB.convocatorias().find(x=>x.id===id)||{}).creadoEn||today():today()};
+  if(!c.titulo){toast('El título es requerido','err');return;} if(!c.perfilId){toast('Selecciona un perfil','err');return;}
+  DB.saveConvocatorias([...DB.convocatorias().filter(x=>x.id!==c.id),c]); closeM(); toast('✓ Convocatoria guardada','ok'); pgConvocatorias();
+}
+function toggleConv(id){ const all=DB.convocatorias(); const c=all.find(x=>x.id===id); if(!c)return; c.estado=c.estado==='activa'?'pausada':'activa'; DB.saveConvocatorias(all); pgConvocatorias(); }
+function delConv(id){ if(!confirm('¿Eliminar convocatoria?'))return; DB.saveConvocatorias(DB.convocatorias().filter(x=>x.id!==id)); pgConvocatorias(); }
+
+// ═══════════════════════════════════════════════
+// PAGE: CANDIDATOS
+// ═══════════════════════════════════════════════
+let filtConv='';
+function pgCandidatos(){
+  const convs=DB.convocatorias(), cands=DB.candidatos();
+  document.getElementById('tb-act').innerHTML=`<button class="btn bp bs" onclick="modalCand()">+ Registrar</button>`;
+  const opts=convs.map(c=>`<option value="${c.id}" ${filtConv===c.id?'selected':''}>${c.titulo}</option>`).join('');
+  const list=filtConv?cands.filter(c=>c.convocatoriaId===filtConv):cands;
+  const rows=list.map(c=>{
+    const conv=convs.find(x=>x.id===c.convocatoriaId);
+    return `<tr><td><strong>${c.apellidos}, ${c.nombres}</strong><br><span class="tgr txs">${c.cedula||'—'} · ${c.ciudad||'—'}</span></td><td><span class="txs">${conv?conv.titulo:'—'}</span></td><td>${fBadge(c.fuente)}</td><td><span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span></td><td>${c.puntajeTotal!=null?`<span class="badge ${scoreCls(c.puntajeTotal)}">${c.puntajeTotal}%</span>`:'—'}</td><td><div class="flex g2"><button class="btn bo bxs" onclick="modalCand('${c.id}')">✏️</button><button class="btn bo bxs" onclick="verCand('${c.id}')">👁️</button><button class="btn bo bxs" onclick="delCand('${c.id}')">🗑️</button></div></td></tr>`;
+  }).join('');
+  document.getElementById('ct').innerHTML=`
+    <div class="flex jb ic mb3" style="flex-wrap:wrap;gap:10px">
+      <select style="max-width:300px" onchange="filtConv=this.value;pgCandidatos()"><option value="">— Todas las convocatorias —</option>${opts}</select>
+      <span class="tgr tsm">${list.length} candidato(s)</span>
+    </div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Convocatoria</th><th>Fuente</th><th>Etapa</th><th>Puntaje</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="tgr" style="text-align:center;padding:24px">Sin candidatos</td></tr>'}</tbody></table></div></div>`;
+}
+function fBadge(f){ const m={correo:'b-cy',referido:'b-pu',otro:'b-gr'}; const l={correo:'📧 Correo',referido:'👥 Referido',otro:'Otro'}; return `<span class="badge ${m[f]||'b-gr'}">${l[f]||f||'—'}</span>`; }
+function modalCand(id=null){
+  const convs=DB.convocatorias(); if(!convs.length){toast('Crea una convocatoria primero','warn');return;}
+  const c=id?DB.candidatos().find(x=>x.id===id):null;
+  const v=c||{nombres:'',apellidos:'',cedula:'',email:'',telefono:'',ciudad:'',convocatoriaId:filtConv||'',fuente:'correo',referidoPor:'',educacion:[],experiencia:[],habilidades:[],idiomas:[],notas:''};
+  const opts=convs.map(x=>`<option value="${x.id}" ${v.convocatoriaId===x.id?'selected':''}>${x.titulo}</option>`).join('');
+  openM(id?'Editar Candidato':'Registrar Candidato',`
+    <div class="tabs"><div class="tab active" id="ca_t0" onclick="swTab('ca',0)">Personal</div><div class="tab" id="ca_t1" onclick="swTab('ca',1)">Formación</div><div class="tab" id="ca_t2" onclick="swTab('ca',2)">Experiencia</div></div>
+    <div id="ca_p0">
+      <div class="fr fr2"><div class="fg"><label>Nombres<span class="rq">*</span></label><input id="ca_nm" value="${v.nombres}"></div><div class="fg"><label>Apellidos<span class="rq">*</span></label><input id="ca_ap" value="${v.apellidos}"></div></div>
+      <div class="fr fr3"><div class="fg"><label>Cédula</label><input id="ca_ci" value="${v.cedula||''}"></div><div class="fg"><label>Teléfono</label><input id="ca_tf" value="${v.telefono||''}"></div><div class="fg"><label>Ciudad</label><input id="ca_cd" value="${v.ciudad||''}"></div></div>
+      <div class="fg"><label>Email</label><input id="ca_em" type="email" value="${v.email||''}"></div>
+      <div class="fr fr2"><div class="fg"><label>Convocatoria<span class="rq">*</span></label><select id="ca_cv"><option value="">—</option>${opts}</select></div><div class="fg"><label>Fuente</label><select id="ca_fu" onchange="document.getElementById('ref_b').style.display=this.value==='referido'?'':'none'"><option value="correo" ${v.fuente==='correo'?'selected':''}>📧 Correo</option><option value="referido" ${v.fuente==='referido'?'selected':''}>👥 Referido</option><option value="otro" ${v.fuente==='otro'?'selected':''}>Otro</option></select></div></div>
+      <div id="ref_b" ${v.fuente!=='referido'?'style="display:none"':''} class="fg"><label>Referido por</label><input id="ca_rf" value="${v.referidoPor||''}"></div>
+      <div class="fg"><label>Notas</label><textarea id="ca_no" rows="2">${v.notas||''}</textarea></div>
+    </div>
+    <div id="ca_p1" class="dn">
+      <div id="edu_list">${eduRows(v.educacion||[])}</div>
+      <button class="btn bo bs mt2" onclick="addEdu()">+ Formación</button>
+      <div class="fg mt3"><label>Habilidades</label><div class="cc" id="ch_cc"></div></div>
+      <div class="fg"><label>Idiomas</label><div class="cc" id="ci_cc"></div></div>
+      <div class="fg"><label>Software</label><div class="cc" id="cs_cc"></div></div>
+    </div>
+    <div id="ca_p2" class="dn">
+      <div id="exp_list">${expRows(v.experiencia||[])}</div>
+      <button class="btn bo bs mt2" onclick="addExp()">+ Experiencia</button>
+    </div>`,
+    `<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bp" onclick="saveCand('${id||''}')">💾 Guardar</button>`,true);
+  setTimeout(()=>{chips('ch_cc','ch_h',v.habilidades||[]);chips('ci_cc','ci_h',v.idiomas||[]);chips('cs_cc','cs_h',[]);},50);
+}
+function eduRows(arr){ return arr.map(e=>`<div class="fr fr3 edu-row"><input class="ed_i" value="${e.institucion||''}" placeholder="Institución"><input class="ed_t" value="${e.titulo||''}" placeholder="Título"><div class="flex g2"><select class="ed_n"><option ${e.nivel==='Bachillerato'?'selected':''}>Bachillerato</option><option ${e.nivel==='Técnico'?'selected':''}>Técnico</option><option ${e.nivel==='Tecnólogo'?'selected':''}>Tecnólogo</option><option ${e.nivel==='Tercer Nivel'?'selected':''}>Tercer Nivel</option><option ${e.nivel==='Cuarto Nivel'?'selected':''}>Cuarto Nivel</option></select><button class="btn bo bxs" onclick="this.closest('.edu-row').remove()">✕</button></div></div>`).join(''); }
+function expRows(arr){ return arr.map(e=>`<div class="exp-row" style="background:var(--g50);padding:10px;border-radius:6px;margin-bottom:8px"><div class="fr fr2"><input class="ex_e" value="${e.empresa||''}" placeholder="Empresa"><input class="ex_c" value="${e.cargo||''}" placeholder="Cargo"></div><div class="fr fr3"><input class="ex_a" value="${e.area||''}" placeholder="Área"><input type="month" class="ex_i" value="${e.inicio||''}"><div class="flex g2"><input type="month" class="ex_f" value="${e.fin||''}"><button class="btn bo bxs" onclick="this.closest('.exp-row').remove()">✕</button></div></div></div>`).join(''); }
+function addEdu(){ const l=document.getElementById('edu_list'); if(!l)return; l.insertAdjacentHTML('beforeend',eduRows([{institucion:'',titulo:'',nivel:'Bachillerato'}])); }
+function addExp(){ const l=document.getElementById('exp_list'); if(!l)return; l.insertAdjacentHTML('beforeend',expRows([{}])); }
+function getEduRows(){ return [...document.querySelectorAll('.edu-row')].map(r=>({institucion:r.querySelector('.ed_i')?.value||'',titulo:r.querySelector('.ed_t')?.value||'',nivel:r.querySelector('.ed_n')?.value||''})).filter(e=>e.institucion||e.titulo); }
+function getExpRows(){ return [...document.querySelectorAll('.exp-row')].map(r=>({empresa:r.querySelector('.ex_e')?.value||'',cargo:r.querySelector('.ex_c')?.value||'',area:r.querySelector('.ex_a')?.value||'',inicio:r.querySelector('.ex_i')?.value||'',fin:r.querySelector('.ex_f')?.value||''})).filter(e=>e.empresa||e.cargo); }
+function saveCand(id){
+  const g=i=>document.getElementById(i)?.value||'';
+  const old=id?DB.candidatos().find(x=>x.id===id):{};
+  const c={id:id||uid(),nombres:g('ca_nm').trim(),apellidos:g('ca_ap').trim(),cedula:g('ca_ci'),email:g('ca_em'),telefono:g('ca_tf'),ciudad:g('ca_cd'),convocatoriaId:g('ca_cv'),fuente:g('ca_fu'),referidoPor:g('ca_rf'),notas:g('ca_no'),educacion:getEduRows(),experiencia:getExpRows(),habilidades:getChips('ch_h'),idiomas:getChips('ci_h'),etapa:old.etapa||'postulado',puntajePreseleccion:old.puntajePreseleccion??null,puntajeSeleccion:old.puntajeSeleccion??null,puntajeEntrevista:old.puntajeEntrevista??null,puntajeTotal:old.puntajeTotal??null,decisionDirector:old.decisionDirector||null,notaDirector:old.notaDirector||'',justificacion:old.justificacion||'',pruebas:old.pruebas||[],entrevistas:old.entrevistas||[],creadoEn:old.creadoEn||today()};
+  if(!c.nombres){toast('El nombre es requerido','err');return;} if(!c.convocatoriaId){toast('Selecciona una convocatoria','err');return;}
+  DB.saveCandidatos([...DB.candidatos().filter(x=>x.id!==c.id),c]); closeM(); toast('✓ Candidato guardado','ok'); pgCandidatos();
+}
+function delCand(id){ if(!confirm('¿Eliminar candidato?'))return; DB.saveCandidatos(DB.candidatos().filter(x=>x.id!==id)); pgCandidatos(); }
+function verCand(id){
+  const c=DB.candidatos().find(x=>x.id===id); if(!c)return;
+  const conv=DB.convocatorias().find(x=>x.id===c.convocatoriaId);
+  const edu=c.educacion?.length?c.educacion.map(e=>`<div>${e.nivel}: <strong>${e.titulo||'—'}</strong> – ${e.institucion||'—'}</div>`).join(''):'<em class="tgr">Sin registros</em>';
+  const exp=c.experiencia?.length?c.experiencia.map(e=>`<div class="mb2"><strong>${e.cargo||'—'}</strong> en ${e.empresa||'—'}<br><span class="tgr txs">${e.area||''} · ${e.inicio||'—'} → ${e.fin||'Actual'}</span></div>`).join(''):'<em class="tgr">Sin registros</em>';
+  openM(`${c.apellidos}, ${c.nombres}`,`
+    <div class="flex g2 mb3" style="flex-wrap:wrap">${fBadge(c.fuente)}<span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span>${c.puntajeTotal!=null?`<span class="badge ${scoreCls(c.puntajeTotal)}">${c.puntajeTotal}%</span>`:''}</div>
+    <div class="fr fr2 mb3"><div><div class="txs tgr">Convocatoria</div><strong>${conv?.titulo||'—'}</strong></div><div><div class="txs tgr">Ciudad</div><strong>${c.ciudad||'—'}</strong></div></div>
+    <div class="div"></div><strong class="tsm">Formación</strong><div class="mt2">${edu}</div>
+    <div class="div"></div><strong class="tsm">Experiencia</strong><div class="mt2">${exp}</div>
+    ${c.habilidades?.length?`<div class="div"></div><strong class="tsm">Habilidades</strong><div class="flex g2 mt2" style="flex-wrap:wrap">${c.habilidades.map(h=>`<span class="badge b-gr">${h}</span>`).join('')}</div>`:''}
+    ${c.notaDirector?`<div class="div"></div><div style="background:#fefce8;border:1px solid #fcd34d;padding:10px;border-radius:6px"><strong>👤 Nota Director:</strong> ${c.notaDirector}</div>`:''}`,
+    `<button class="btn bo" onclick="closeM()">Cerrar</button><button class="btn bp" onclick="closeM();modalCand('${id}')">✏️ Editar</button>`);
+}
+// ═══════════════════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════════════════
+function calcPresel(cand, perf){
+  if(!perf) return 0;
+  let score=0, max=0;
+  const niv=['Bachillerato','Técnico','Tecnólogo','Tercer Nivel','Cuarto Nivel'];
+  const reqN=niv.indexOf(perf.educacionNivel||'Bachillerato');
+  const candN=cand.educacion?.length?Math.max(...cand.educacion.map(e=>Math.max(0,niv.indexOf(e.nivel)))):-1;
+  max+=25; if(candN>=reqN) score+=25; else if(candN===reqN-1) score+=15;
+  max+=25;
+  const reqA=perf.expAnios||0;
+  if(reqA===0){score+=25;}else{
+    const meses=(cand.experiencia||[]).reduce((s,e)=>{if(!e.inicio)return s;const i=new Date(e.inicio+'-01'),f=e.fin?new Date(e.fin+'-01'):new Date();return s+Math.max(0,(f-i)/(1000*60*60*24*30));},0);
+    const anos=meses/12;
+    if(anos>=reqA)score+=25;else if(anos>=reqA*.7)score+=15;else if(anos>0)score+=8;
+  }
+  max+=25;
+  const rH=(perf.habilidades||[]).map(h=>h.toLowerCase()), cH=(cand.habilidades||[]).map(h=>h.toLowerCase());
+  if(!rH.length)score+=25;else{const m=rH.filter(h=>cH.some(c=>c.includes(h)||h.includes(c))).length;score+=Math.round(m/rH.length*25);}
+  max+=15;
+  const rS=(perf.software||[]).map(s=>s.toLowerCase()), cS=[...(cand.habilidades||[]),...(cand.idiomas||[])].map(x=>x.toLowerCase());
+  if(!rS.length)score+=15;else{const m=rS.filter(s=>cS.some(c=>c.includes(s)||s.includes(c))).length;score+=Math.round(m/rS.length*15);}
+  max+=10;
+  const rI=(perf.idiomas||['Español']).map(i=>i.toLowerCase()), cI=(cand.idiomas||[]).map(i=>i.toLowerCase());
+  const mI=rI.filter(i=>cI.some(c=>c.includes(i)||i.includes(c))).length;
+  score+=Math.round(mI/Math.max(1,rI.length)*10);
+  return Math.round(score/max*100);
+}
+function calcTotal(c){ const p=c.puntajePreseleccion,s=c.puntajeSeleccion,e=c.puntajeEntrevista; if(p==null)return null; if(s==null&&e==null)return p; if(e==null)return Math.round(p*.5+s*.5); return Math.round(p*.3+s*.3+e*.4); }
+
+// ═══════════════════════════════════════════════
+// PAGE: PRESELECCIÓN
+// ═══════════════════════════════════════════════
+let preConv='';
+function pgPresel(){
+  const convs=DB.convocatorias();
+  document.getElementById('tb-act').innerHTML='';
+  const opts=convs.map(c=>`<option value="${c.id}" ${preConv===c.id?'selected':''}>${c.titulo}</option>`).join('');
+  let body='';
+  if(preConv){
+    const conv=convs.find(c=>c.id===preConv), perf=conv?DB.perfiles().find(p=>p.id===conv.perfilId):null;
+    // auto-score unscored
+    const all=DB.candidatos(); let changed=false;
+    all.forEach((c,i)=>{ if(c.convocatoriaId===preConv&&c.puntajePreseleccion==null&&!c.decisionDirector){all[i].puntajePreseleccion=calcPresel(c,perf);changed=true;} });
+    if(changed) DB.saveCandidatos(all);
+    const cands=DB.candidatos().filter(c=>c.convocatoriaId===preConv&&['postulado','preseleccionado','descartado_pre'].includes(c.etapa)).sort((a,b)=>(b.puntajePreseleccion||0)-(a.puntajePreseleccion||0));
+    const aptos=cands.filter(c=>c.etapa==='preseleccionado').length, desc=cands.filter(c=>c.etapa==='descartado_pre').length;
+    const rows=cands.map(c=>{
+      const s=c.puntajePreseleccion||0;
+      return `<tr><td><div class="flex ic g2"><span class="sem ${semCls(s)}"></span><div><strong>${c.apellidos}, ${c.nombres}</strong><br><span class="tgr txs">${fBadge(c.fuente)}</span></div></div></td>
+      <td><div class="flex ic g2"><div class="pb" style="width:70px"><div class="pf" style="width:${s}%;background:${scoreColor(s)}"></div></div><span class="badge ${scoreCls(s)}">${s}%</span>${c.decisionDirector?'<span class="badge b-yw">👤</span>':''}</div></td>
+      <td><span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span></td>
+      <td><div class="flex g2"><button class="btn bg bxs" onclick="moverCand('${c.id}','preseleccionado')">✓</button><button class="btn br bxs" onclick="moverCand('${c.id}','descartado_pre')">✕</button><button class="btn bw bxs" onclick="overrideDir('${c.id}')">👤</button></div></td></tr>`;
+    }).join('');
+    body=`<div class="flex g2 mb3" style="flex-wrap:wrap"><span class="badge b-bl">${cands.length} candidatos</span><span class="badge b-gn">${aptos} aptos</span><span class="badge b-rd">${desc} descartados</span><button class="btn bo bxs" onclick="autoPresel('${preConv}')">⚡ Auto-clasificar</button><button class="btn bp bxs" onclick="pasarSeleccion('${preConv}')">→ Pasar a Selección</button></div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Puntaje</th><th>Estado</th><th>Decisión</th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="tgr" style="text-align:center;padding:20px">Sin candidatos</td></tr>'}</tbody></table></div></div>`;
+  }
+  document.getElementById('ct').innerHTML=`<div class="al al-i">El sistema puntúa automáticamente según el perfil. Puedes ajustar cualquier decisión con tu criterio como Director.</div><div class="fg" style="max-width:380px"><label>Convocatoria</label><select onchange="preConv=this.value;pgPresel()"><option value="">— Seleccionar —</option>${opts}</select></div>${body}`;
+}
+function moverCand(id,etapa,nota=null){
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===id); if(idx<0)return;
+  all[idx].etapa=etapa; if(nota!==null) all[idx].notaDirector=nota;
+  // recalc total
+  all[idx].puntajeTotal=calcTotal(all[idx]);
+  DB.saveCandidatos(all);
+  const p=curPage; if(p==='presel')pgPresel(); else if(p==='seleccion')pgSeleccion(); else if(p==='entrevistas')pgEntrevistas();
+}
+function overrideDir(id){
+  const c=DB.candidatos().find(x=>x.id===id); if(!c)return;
+  openM('Decisión del Director',`<div class="al al-w">Tu decisión sobreescribe el puntaje automático. Debe quedar justificada.</div>
+    <div class="fg"><label>Candidato</label><input disabled value="${c.apellidos}, ${c.nombres}"></div>
+    <div class="fg"><label>Mover a</label><select id="ov_e"><option value="preseleccionado">✓ Preseleccionado</option><option value="descartado_pre">✕ Descartado</option><option value="en_seleccion">→ Selección directa</option></select></div>
+    <div class="fg"><label>Justificación<span class="rq">*</span></label><textarea id="ov_n" rows="3" placeholder="Razón de la decisión...">${c.notaDirector||''}</textarea></div>`,
+    `<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bw" onclick="applyOverride('${id}')">👤 Aplicar</button>`);
+}
+function applyOverride(id){
+  const etapa=document.getElementById('ov_e')?.value, nota=document.getElementById('ov_n')?.value?.trim();
+  if(!nota){toast('La justificación es requerida','err');return;}
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===id); if(idx<0)return;
+  all[idx].etapa=etapa; all[idx].notaDirector=nota; all[idx].decisionDirector=true;
+  DB.saveCandidatos(all); closeM(); toast('✓ Decisión aplicada','ok');
+  const p=curPage; if(p==='presel')pgPresel(); else if(p==='seleccion')pgSeleccion();
+}
+function autoPresel(convId){
+  const conv=DB.convocatorias().find(c=>c.id===convId), perf=conv?DB.perfiles().find(p=>p.id===conv.perfilId):null;
+  const all=DB.candidatos();
+  all.forEach((c,i)=>{ if(c.convocatoriaId!==convId||c.decisionDirector)return; const s=calcPresel(c,perf); all[i].puntajePreseleccion=s; if(['postulado','preseleccionado','descartado_pre'].includes(c.etapa)) all[i].etapa=s>=50?'preseleccionado':'descartado_pre'; });
+  DB.saveCandidatos(all); toast('✓ Clasificación automática aplicada','ok'); pgPresel();
+}
+function pasarSeleccion(convId){
+  const all=DB.candidatos(); let n=0;
+  all.forEach((c,i)=>{ if(c.convocatoriaId===convId&&c.etapa==='preseleccionado'){all[i].etapa='en_seleccion';n++;} });
+  DB.saveCandidatos(all); toast(`${n} candidato(s) pasaron a Selección`,'ok'); pgPresel();
+}
+// ═══════════════════════════════════════════════
+// PAGE: SELECCIÓN
+// ═══════════════════════════════════════════════
+let selConv='';
+function pgSeleccion(){
+  const convs=DB.convocatorias();
+  document.getElementById('tb-act').innerHTML='';
+  const opts=convs.map(c=>`<option value="${c.id}" ${selConv===c.id?'selected':''}>${c.titulo}</option>`).join('');
+  let body='';
+  if(selConv){
+    const cands=DB.candidatos().filter(c=>c.convocatoriaId===selConv&&['en_seleccion','descartado_sel'].includes(c.etapa)).sort((a,b)=>(b.puntajeSeleccion||b.puntajePreseleccion||0)-(a.puntajeSeleccion||a.puntajePreseleccion||0));
+    const rows=cands.map(c=>{
+      const pr=c.pruebas||[], prom=pr.length?Math.round(pr.reduce((s,p)=>s+p.puntaje,0)/pr.length):null;
+      return `<tr><td><strong>${c.apellidos}, ${c.nombres}</strong></td>
+      <td>${c.puntajePreseleccion!=null?`<span class="badge ${scoreCls(c.puntajePreseleccion)}">${c.puntajePreseleccion}%</span>`:'—'}</td>
+      <td>${pr.length?pr.map(p=>`<span class="badge b-gr" style="margin:1px">${p.nombre}: ${p.puntaje}%</span>`).join(''):'<span class="tgr txs">Sin pruebas</span>'}</td>
+      <td>${prom!=null?`<span class="badge ${scoreCls(prom)}">${prom}%</span>`:'—'}</td>
+      <td><span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span></td>
+      <td><div class="flex g2">
+        <button class="btn bo bxs" onclick="modalPrueba('${c.id}')">+ Prueba</button>
+        <button class="btn bg bxs" onclick="moverCand('${c.id}','en_entrevista')">→ Entrevista</button>
+        <button class="btn br bxs" onclick="moverCand('${c.id}','descartado_sel')">✕</button>
+        <button class="btn bw bxs" onclick="overrideDir('${c.id}')">👤</button>
+      </div></td></tr>`;
+    }).join('');
+    body=`<div class="flex g2 mb3"><button class="btn bp bxs" onclick="pasarEntrevistas('${selConv}')">→ Pasar mejores a Entrevista</button></div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Presel.</th><th>Pruebas</th><th>Promedio</th><th>Etapa</th><th>Acciones</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="tgr" style="text-align:center;padding:20px">Sin candidatos en selección</td></tr>'}</tbody></table></div></div>`;
+  }
+  document.getElementById('ct').innerHTML=`<div class="al al-i">Registra pruebas técnicas o psicométricas. El promedio de pruebas es el puntaje de selección.</div><div class="fg" style="max-width:380px"><label>Convocatoria</label><select onchange="selConv=this.value;pgSeleccion()"><option value="">— Seleccionar —</option>${opts}</select></div>${body}`;
+}
+function modalPrueba(candId){
+  const c=DB.candidatos().find(x=>x.id===candId); if(!c)return;
+  const prev=(c.pruebas||[]).map((p,i)=>`<div class="flex ic g2 mb2"><span class="flex-1">${p.nombre}</span><span class="badge ${scoreCls(p.puntaje)}">${p.puntaje}%</span><span class="txs tgr">${p.fecha||''}</span><button class="btn bo bxs" onclick="delPrueba('${candId}',${i})">✕</button></div>`).join('');
+  openM(`Pruebas — ${c.apellidos}, ${c.nombres}`,`${prev?`<div class="mb3">${prev}</div><div class="div"></div>`:''}
+    <div class="fr fr2"><div class="fg"><label>Tipo de Prueba</label><select id="pr_n"><option>Psicométrica</option><option>Técnica</option><option>Conocimientos</option><option>Idioma</option><option>Personalidad</option><option>Assessment</option></select></div><div class="fg"><label>Puntaje (0–100)</label><input id="pr_p" type="number" min="0" max="100" value="70"></div></div>
+    <div class="fg"><label>Observaciones</label><textarea id="pr_o" rows="2"></textarea></div>`,
+    `<button class="btn bo" onclick="closeM()">Cerrar</button><button class="btn bp" onclick="savePrueba('${candId}')">+ Agregar</button>`);
+}
+function savePrueba(candId){
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===candId); if(idx<0)return;
+  const p={nombre:document.getElementById('pr_n')?.value,puntaje:parseInt(document.getElementById('pr_p')?.value||0),obs:document.getElementById('pr_o')?.value||'',fecha:today()};
+  if(!all[idx].pruebas) all[idx].pruebas=[];
+  all[idx].pruebas.push(p);
+  const ps=all[idx].pruebas;
+  all[idx].puntajeSeleccion=Math.round(ps.reduce((s,x)=>s+x.puntaje,0)/ps.length);
+  all[idx].puntajeTotal=calcTotal(all[idx]);
+  DB.saveCandidatos(all); closeM(); toast('✓ Prueba registrada','ok'); pgSeleccion();
+}
+function delPrueba(candId,i){
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===candId); if(idx<0)return;
+  all[idx].pruebas.splice(i,1);
+  const ps=all[idx].pruebas;
+  all[idx].puntajeSeleccion=ps.length?Math.round(ps.reduce((s,x)=>s+x.puntaje,0)/ps.length):null;
+  all[idx].puntajeTotal=calcTotal(all[idx]);
+  DB.saveCandidatos(all); closeM(); pgSeleccion();
+}
+function pasarEntrevistas(convId){
+  const all=DB.candidatos(); let n=0;
+  all.forEach((c,i)=>{ if(c.convocatoriaId===convId&&c.etapa==='en_seleccion'){all[i].etapa='en_entrevista';n++;} });
+  DB.saveCandidatos(all); toast(`${n} candidato(s) pasaron a Entrevistas`,'ok'); pgSeleccion();
+}
+
+// ═══════════════════════════════════════════════
+// PAGE: ENTREVISTAS
+// ═══════════════════════════════════════════════
+let entConv='';
+function pgEntrevistas(){
+  const convs=DB.convocatorias();
+  document.getElementById('tb-act').innerHTML='';
+  const opts=convs.map(c=>`<option value="${c.id}" ${entConv===c.id?'selected':''}>${c.titulo}</option>`).join('');
+  let body='';
+  if(entConv){
+    const cands=DB.candidatos().filter(c=>c.convocatoriaId===entConv&&['en_entrevista','finalista','seleccionado','reserva'].includes(c.etapa)).sort((a,b)=>(b.puntajeTotal||0)-(a.puntajeTotal||0));
+    const rows=cands.map(c=>{
+      const ents=c.entrevistas||[], prom=ents.length?Math.round(ents.reduce((s,e)=>s+e.puntaje,0)/ents.length):null;
+      const tot=calcTotal(c);
+      return `<tr><td><strong>${c.apellidos}, ${c.nombres}</strong></td>
+      <td>${c.puntajePreseleccion!=null?`<span class="badge ${scoreCls(c.puntajePreseleccion)}">${c.puntajePreseleccion}%</span>`:'—'}</td>
+      <td>${c.puntajeSeleccion!=null?`<span class="badge ${scoreCls(c.puntajeSeleccion)}">${c.puntajeSeleccion}%</span>`:'—'}</td>
+      <td>${prom!=null?`<span class="badge ${scoreCls(prom)}">${prom}%</span>`:'<span class="tgr txs">Pendiente</span>'}</td>
+      <td>${tot!=null?`<span class="badge ${scoreCls(tot)}">${tot}%</span>`:'—'}</td>
+      <td><span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span></td>
+      <td><div class="flex g2"><button class="btn bo bxs" onclick="modalEntrevista('${c.id}')">+ Entrev.</button><button class="btn bw bxs" onclick="overrideDir('${c.id}')">👤</button></div></td></tr>`;
+    }).join('');
+    body=`<div class="flex g2 mb3"><button class="btn bp bxs" onclick="definirFinalistas('${entConv}')">⭐ Definir Finalistas</button></div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Presel.</th><th>Selec.</th><th>Entrev.</th><th>Total</th><th>Etapa</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="tgr" style="text-align:center;padding:20px">Sin candidatos</td></tr>'}</tbody></table></div></div>`;
+  }
+  document.getElementById('ct').innerHTML=`<div class="al al-i">El puntaje total combina: Preselección 30% + Selección 30% + Entrevista 40%.</div><div class="fg" style="max-width:380px"><label>Convocatoria</label><select onchange="entConv=this.value;pgEntrevistas()"><option value="">— Seleccionar —</option>${opts}</select></div>${body}`;
+}
+function modalEntrevista(candId){
+  const c=DB.candidatos().find(x=>x.id===candId); if(!c)return;
+  const conv=DB.convocatorias().find(x=>x.id===c.convocatoriaId), perf=conv?DB.perfiles().find(p=>p.id===conv.perfilId):null;
+  const comps=(perf?.competencias||[{nombre:'Evaluación General',peso:100}]).filter(c=>c.nombre);
+  window._comps=comps;
+  const prev=(c.entrevistas||[]).map(e=>`<div class="flex ic g2 mb1 tsm"><span class="flex-1">${e.entrevistador||'—'} (${e.tipo||'—'})</span><span class="badge ${scoreCls(e.puntaje)}">${e.puntaje}%</span><span class="tgr txs">${e.fecha||''}</span></div>`).join('');
+  const sliders=comps.map((comp,i)=>`<div class="fg"><label>${comp.nombre} <span class="tgr txs">(${comp.peso}%)</span></label><div class="rw"><input type="range" id="ec_${i}" min="0" max="100" value="70" oninput="document.getElementById('ev_${i}').textContent=this.value+'%';calcEntTotal()"><span class="rv" id="ev_${i}">70%</span></div></div>`).join('');
+  openM(`Entrevista — ${c.apellidos}, ${c.nombres}`,`
+    ${prev?`<div class="mb3"><strong class="txs tgr">Entrevistas previas:</strong><div class="mt1">${prev}</div></div><div class="div"></div>`:''}
+    <div class="fr fr2"><div class="fg"><label>Entrevistador</label><input id="ew_q" placeholder="Tu nombre"></div><div class="fg"><label>Tipo</label><select id="ew_t"><option>1ra Entrevista</option><option>2da Entrevista</option><option>Panel</option><option>Técnica</option><option>Final</option></select></div></div>
+    <div class="div"></div><strong class="tsm">Evaluación por Competencias</strong><div class="mt3">${sliders}</div>
+    <div style="background:var(--pl);padding:10px;border-radius:6px;margin-top:8px"><strong>Total estimado: <span id="ew_tot">70%</span></strong></div>
+    <div class="fg mt3"><label>Observaciones</label><textarea id="ew_o" rows="3" placeholder="Impresiones, fortalezas, preocupaciones..."></textarea></div>
+    <div class="fg"><label>Recomendación</label><select id="ew_r"><option value="recomendar">✓ Recomendar</option><option value="reserva">~ Reserva</option><option value="no_recomendar">✕ No recomendar</option></select></div>`,
+    `<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bp" onclick="saveEntrevista('${candId}')">💾 Guardar</button>`);
+  setTimeout(calcEntTotal,50);
+}
+function calcEntTotal(){
+  const comps=window._comps||[]; if(!comps.length)return;
+  const tp=comps.reduce((s,c)=>s+c.peso,0)||1;
+  const score=comps.reduce((s,c,i)=>s+parseInt(document.getElementById(`ec_${i}`)?.value||0)*(c.peso/tp),0);
+  const el=document.getElementById('ew_tot'); if(el) el.textContent=Math.round(score)+'%';
+}
+function saveEntrevista(candId){
+  const comps=window._comps||[], tp=comps.reduce((s,c)=>s+c.peso,0)||1;
+  const puntaje=Math.round(comps.reduce((s,c,i)=>s+parseInt(document.getElementById(`ec_${i}`)?.value||0)*(c.peso/tp),0));
+  const ent={entrevistador:document.getElementById('ew_q')?.value||'Director',tipo:document.getElementById('ew_t')?.value,puntaje,obs:document.getElementById('ew_o')?.value||'',recomendacion:document.getElementById('ew_r')?.value,fecha:today()};
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===candId); if(idx<0)return;
+  if(!all[idx].entrevistas) all[idx].entrevistas=[];
+  all[idx].entrevistas.push(ent);
+  const ents=all[idx].entrevistas;
+  all[idx].puntajeEntrevista=Math.round(ents.reduce((s,e)=>s+e.puntaje,0)/ents.length);
+  all[idx].puntajeTotal=calcTotal(all[idx]);
+  DB.saveCandidatos(all); closeM(); toast('✓ Entrevista registrada','ok'); pgEntrevistas();
+}
+function definirFinalistas(convId){
+  const conv=DB.convocatorias().find(c=>c.id===convId), vac=conv?.vacantes||1;
+  const all=DB.candidatos();
+  const aptos=all.filter(c=>c.convocatoriaId===convId&&c.etapa==='en_entrevista').sort((a,b)=>(b.puntajeTotal||0)-(a.puntajeTotal||0));
+  aptos.forEach((c,i)=>{ const idx=all.findIndex(x=>x.id===c.id); if(idx<0)return; if(i<vac)all[idx].etapa='finalista'; else if(i<vac+2)all[idx].etapa='reserva'; });
+  DB.saveCandidatos(all); toast(`Finalistas definidos: ${Math.min(aptos.length,vac)} principal(es) + hasta 2 reservas`,'ok'); pgEntrevistas();
+}
+// ═══════════════════════════════════════════════
+// PAGE: INFORME FINAL
+// ═══════════════════════════════════════════════
+let infConv='';
+function pgInforme(){
+  const convs=DB.convocatorias();
+  document.getElementById('tb-act').innerHTML='';
+  const opts=convs.map(c=>`<option value="${c.id}" ${infConv===c.id?'selected':''}>${c.titulo}</option>`).join('');
+  let body='';
+  if(infConv){
+    const conv=convs.find(c=>c.id===infConv), perf=conv?DB.perfiles().find(p=>p.id===conv.perfilId):null;
+    const cands=DB.candidatos().filter(c=>c.convocatoriaId===infConv);
+    const sels=cands.filter(c=>c.etapa==='seleccionado').sort((a,b)=>(b.puntajeTotal||0)-(a.puntajeTotal||0));
+    const fins=cands.filter(c=>c.etapa==='finalista').sort((a,b)=>(b.puntajeTotal||0)-(a.puntajeTotal||0));
+    const reservas=cands.filter(c=>c.etapa==='reserva').sort((a,b)=>(b.puntajeTotal||0)-(a.puntajeTotal||0));
+    const desc=cands.filter(c=>['descartado_pre','descartado_sel','descartado_final'].includes(c.etapa));
+    const principales=sels.length?sels:fins;
+    const vac=conv?.vacantes||1;
+
+    const statH=`<div class="sg">
+      <div class="sc bl"><div class="sl">Total Candidatos</div><div class="sv">${cands.length}</div></div>
+      <div class="sc yw"><div class="sl">Llegaron a Entrevista</div><div class="sv">${cands.filter(c=>['en_entrevista','finalista','seleccionado','reserva'].includes(c.etapa)).length}</div></div>
+      <div class="sc gn"><div class="sl">Finalistas</div><div class="sv">${principales.length}</div></div>
+      <div class="sc rd"><div class="sl">Descartados</div><div class="sv">${desc.length}</div></div>
+    </div>`;
+
+    const prinH=principales.slice(0,vac).map((c,i)=>`
+      <div class="card mb3" style="border-left:4px solid var(--g)"><div class="cb">
+        <div class="flex jb ic mb3" style="flex-wrap:wrap;gap:8px">
+          <div><span class="badge b-gn mb2">${i===0?'🏆 Principal':'✓ Seleccionado'}</span><h3 style="font-size:15px">${c.apellidos}, ${c.nombres}</h3><div class="tsm tgr">${c.ciudad||'—'} · ${fBadge(c.fuente)}</div></div>
+          <div style="text-align:right"><div class="txs tgr">Puntaje Total</div><div style="font-size:28px;font-weight:800;color:var(--g)">${c.puntajeTotal||'—'}%</div></div>
+        </div>
+        <div class="flex g2 mb3" style="flex-wrap:wrap">
+          ${c.puntajePreseleccion!=null?`<span class="badge b-gr">Presel: ${c.puntajePreseleccion}%</span>`:''}
+          ${c.puntajeSeleccion!=null?`<span class="badge b-gr">Selec: ${c.puntajeSeleccion}%</span>`:''}
+          ${c.puntajeEntrevista!=null?`<span class="badge b-gr">Entrev: ${c.puntajeEntrevista}%</span>`:''}
+        </div>
+        <div class="fg"><label>Justificación de Selección</label><textarea id="just_${c.id}" rows="3" placeholder="Describe por qué es el más apto...">${c.justificacion||''}</textarea></div>
+        <div class="flex g2 mt2" style="flex-wrap:wrap">
+          <button class="btn bg bs" onclick="confirmarSel('${c.id}')">✓ Confirmar Seleccionado</button>
+          ${perf?`<button class="btn bo bs" onclick="pdfManual('${perf.id}','${c.id}')">📄 Manual de Funciones PDF</button>`:''}
+          <button class="btn bo bs" onclick="moverCand('${c.id}','reserva');pgInforme()">→ Reserva</button>
+        </div>
+      </div>`).join('');
+
+    const resH=reservas.map((c,i)=>`<div class="card mb2" style="border-left:4px solid var(--w)"><div class="cb" style="padding:12px">
+      <div class="flex jb ic" style="flex-wrap:wrap;gap:8px">
+        <div><span class="badge b-yw">Reserva ${i+1}</span><strong style="margin-left:8px">${c.apellidos}, ${c.nombres}</strong></div>
+        <div class="flex ic g2"><span style="font-size:17px;font-weight:700;color:var(--w)">${c.puntajeTotal||'—'}%</span>
+          <button class="btn bp bxs" onclick="confirmarSel('${c.id}')">↑ Promover</button>
+          ${perf?`<button class="btn bo bxs" onclick="pdfManual('${perf.id}','${c.id}')">📄 PDF</button>`:''}
+        </div>
+      </div>
+    </div></div>`).join('');
+
+    const descRows=desc.map(c=>`<tr><td>${c.apellidos}, ${c.nombres}</td><td>${c.puntajePreseleccion!=null?c.puntajePreseleccion+'%':'—'}</td><td><span class="badge ${EB[c.etapa]||'b-gr'}">${EL[c.etapa]||c.etapa}</span></td><td class="txs tgr">${c.notaDirector||'Puntaje insuficiente'}</td></tr>`).join('');
+
+    body=`${statH}
+    <div class="card mb4"><div class="ch"><span class="ct2">📋 Convocatoria</span></div><div class="cb"><div class="fr fr3"><div><div class="txs tgr">Cargo</div><strong>${conv?.titulo||'—'}</strong></div><div><div class="txs tgr">Perfil/Área</div><strong>${perf?.nombre||'—'} · ${perf?.area||'—'}</strong></div><div><div class="txs tgr">Vacantes</div><strong>${vac}</strong></div></div></div></div>
+    ${principales.length?`<h3 class="mb3">✅ Candidatos Principales</h3>${prinH}`:`<div class="al al-w">No hay finalistas aún. Ve a <strong>Entrevistas</strong> y haz clic en <strong>Definir Finalistas</strong>.</div>`}
+    ${reservas.length?`<h3 class="mb3 mt4">🔄 Reservas</h3>${resH}`:''}
+    ${desc.length?`<h3 class="mb3 mt4">📋 Descartados (Trazabilidad Legal)</h3><div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Puntaje</th><th>Razón</th><th>Notas</th></tr></thead><tbody>${descRows}</tbody></table></div></div>`:''}
+    <div class="flex g3 mt4" style="flex-wrap:wrap">
+      <button class="btn bo" onclick="window.print()">🖨️ Imprimir Informe</button>
+    </div>`;
+  }
+  document.getElementById('ct').innerHTML=`<div class="fg" style="max-width:380px"><label>Convocatoria</label><select onchange="infConv=this.value;pgInforme()"><option value="">— Seleccionar —</option>${opts}</select></div>${body||(!infConv?`<div class="es"><div class="ei">📄</div><h3>Selecciona una convocatoria</h3></div>`:'')}`;
+}
+function confirmarSel(id){
+  const all=DB.candidatos(), idx=all.findIndex(c=>c.id===id); if(idx<0)return;
+  const just=document.getElementById('just_'+id)?.value||'';
+  all[idx].etapa='seleccionado'; all[idx].justificacion=just;
+  DB.saveCandidatos(all); toast('✓ Candidato confirmado como Seleccionado','ok'); pgInforme();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+(async function init(){
+  updateSBLogo();
+  // Try to pull from GitHub on startup
+  const cfg=getConfig();
+  if(cfg.ghToken&&cfg.ghOwner&&cfg.ghRepo){
+    setSyncState('ing');
+    await pullFromGH().catch(()=>setSyncState('off'));
+  }
+  go('dashboard');
+})();
+</script>
+
+<div id="pwa-install-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1e40af;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;z-index:9998;font-size:13px">
+  <span>📱 Instalar RRHH Pro como app en este dispositivo</span>
+  <div style="display:flex;gap:8px">
+    <button onclick="installPWA()" style="background:#fff;color:#1e40af;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer">Instalar</button>
+    <button onclick="document.getElementById('pwa-install-bar').style.display='none'" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer">✕</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// PWA: Manifest dinámico + Service Worker
+// ═══════════════════════════════════════════════
+(function setupPWA(){
+  // Dynamic manifest
+  const manifest = {
+    name: "RRHH Pro — Selección de Personal",
+    short_name: "RRHH Pro",
+    description: "Sistema de selección de personal con preselección, entrevistas e informes",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#f8fafc",
+    theme_color: "#1e293b",
+    orientation: "any",
+    icons: [
+      { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231e40af'/><text x='96' y='130' font-size='100' text-anchor='middle' fill='white'>👥</text></svg>`), sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+      { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231e40af'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='white'>👥</text></svg>`), sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+
+  // Service Worker for offline support
+  if('serviceWorker' in navigator){
+    const swCode = `
+const CACHE = 'rrhh-pro-v1';
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if(e.request.method !== 'GET') return;
+  e.respondWith(caches.match(e.request).then(cached => {
+    const fresh = fetch(e.request).then(res => {
+      if(res && res.status === 200) {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return res;
+    }).catch(() => cached);
+    return cached || fresh;
+  }));
+});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl, {scope: '/'})
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  }
+
+  // PWA Install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwa-install-bar').style.display = 'flex';
+  });
+  window.installPWA = function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('pwa-install-bar').style.display='none'; });
+  };
+  window.addEventListener('appinstalled', ()=>{
+    document.getElementById('pwa-install-bar').style.display='none';
+    toast('✓ App instalada correctamente','ok');
+  });
+})();
+</script>
+</body>
+</html>
