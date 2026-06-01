@@ -337,9 +337,11 @@ function buildCC(cid,hid,arr){
   var h=document.createElement('input');h.type='hidden';h.id=hid;h.value=JSON.stringify(arr);c.appendChild(h);
   arr.forEach(function(v){
     var sp=document.createElement('span');sp.className='chip';
-    var safe=v.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    sp.innerHTML=v+' <button class="chip-x" type="button" onclick="rmChip(''+cid+'',''+hid+'',''+safe+'')">&times;</button>';
-    c.appendChild(sp);
+    var txt=document.createTextNode(v+' ');sp.appendChild(txt);
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='chip-x';btn.innerHTML='&times;';
+    btn.addEventListener('click',function(e){e.stopPropagation();buildCC(cid,hid,gChips(hid).filter(function(x){return x!==v;}));});
+    sp.appendChild(btn);c.appendChild(sp);
   });
   var inp=document.createElement('input');inp.type='text';inp.className='ci';inp.placeholder='Escribe y Enter...';
   inp.addEventListener('keydown',function(e){
@@ -496,13 +498,11 @@ function modalPerfil(id){
     expArea:'',funciones:[],habilidades:[],idiomas:['Espanol'],software:[],
     competencias:[{nombre:'Orientacion al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicacion',peso:25},{nombre:'Proactividad',peso:25}]};
   var nivs=['Bachillerato','Tecnico','Tecnologo','Tercer Nivel','Cuarto Nivel'];
-  var compH='<div id="comp_list">';
-  var comps=v.competencias&&v.competencias.length?v.competencias:[{nombre:'Orientacion al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicacion',peso:25},{nombre:'Proactividad',peso:25}];
-  comps.forEach(function(co,i){
-    compH+=compRow(i,co.nombre,co.peso);
-  });
-  compH+='</div><button class="btn bo bs mt2" onclick="addComp()" type="button">+ Agregar Competencia</button>'
-    +'<div class="mt2 tsm tgr" id="comp_total">Total: '+comps.reduce(function(s,c){return s+c.peso;},0)+'%</div>';
+  // competencias rendered via DOM after modal opens
+  var _initComps=v.competencias&&v.competencias.length?v.competencias:[{nombre:'Orientacion al logro',peso:25},{nombre:'Trabajo en equipo',peso:25},{nombre:'Comunicacion',peso:25},{nombre:'Proactividad',peso:25}];
+  var compH='<div id="comp_list"></div>'
+    +'<button class="btn bo bs mt2" onclick="addComp()" type="button">+ Agregar Competencia</button>'
+    +'<div class="mt2 tsm tgr" id="comp_total">Calculando...</div>';
   var body='<div class="tabs">'
     +'<div class="tab on" id="pft0" onclick="swTab(\'pf\',0)">General</div>'
     +'<div class="tab" id="pft1" onclick="swTab(\'pf\',1)">Requisitos</div>'
@@ -544,6 +544,8 @@ function modalPerfil(id){
     mkCC('ha_cc','ha_h',v.habilidades||[]);
     mkCC('id_cc','id_h',v.idiomas||['Espanol']);
     mkCC('so_cc','so_h',v.software||[]);
+    var list=document.getElementById('comp_list');
+    if(list){_initComps.forEach(function(co,i){list.appendChild(compRow(i,co.nombre,co.peso));});updCompTotal();}
   },60);
 }
 
@@ -1122,19 +1124,24 @@ function confirmarSel(id){
 // ── COMP HELPERS ───────────────────────────────
 var _compIdx=100;
 function compRow(i,nombre,peso){
-  return '<div class="comp-row fr fr2" style="align-items:center;margin-bottom:10px" id="cr'+i+'">'
-    +'<input class="comp-n" value="'+(nombre||'')+'" placeholder="Nombre de la competencia" oninput="updCompTotal()">'
-    +'<div class="rw" style="flex:1">'
-    +'<input type="range" class="comp-p" min="0" max="100" value="'+(peso||25)+'" oninput="this.nextElementSibling.textContent=this.value+'%';updCompTotal()">'
-    +'<span class="rv">'+(peso||25)+'%</span>'
-    +'<button class="btn br bxs" onclick="this.closest('.comp-row').remove();updCompTotal()" type="button" title="Eliminar">&#10005;</button>'
-    +'</div></div>';
+  var d=document.createElement('div');
+  d.className='comp-row fr fr2';d.style.cssText='align-items:center;margin-bottom:10px';
+  var inp=document.createElement('input');inp.className='comp-n';inp.value=nombre||'';inp.placeholder='Nombre de la competencia';inp.addEventListener('input',updCompTotal);
+  var rw=document.createElement('div');rw.className='rw';rw.style.flex='1';
+  var range=document.createElement('input');range.type='range';range.className='comp-p';range.min=0;range.max=100;range.value=peso||25;
+  var span=document.createElement('span');span.className='rv';span.textContent=(peso||25)+'%';
+  range.addEventListener('input',function(){span.textContent=this.value+'%';updCompTotal();});
+  var btn=document.createElement('button');btn.type='button';btn.className='btn br bxs';btn.title='Eliminar';btn.innerHTML='&#10005;';
+  btn.addEventListener('click',function(){d.parentNode&&d.parentNode.removeChild(d);updCompTotal();});
+  rw.appendChild(range);rw.appendChild(span);rw.appendChild(btn);
+  d.appendChild(inp);d.appendChild(rw);
+  return d;
 }
 function addComp(){
   _compIdx++;
   var list=document.getElementById('comp_list');
   if(!list)return;
-  list.insertAdjacentHTML('beforeend',compRow(_compIdx,'',25));
+  list.appendChild(compRow(_compIdx,'',25));
   updCompTotal();
 }
 function updCompTotal(){
