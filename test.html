@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e40af">
+<title>Evaluación de Candidato</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#2563eb;--pd:#1e40af;--g:#059669;--r:#dc2626;--w:#d97706;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g400:#94a3b8;--g500:#64748b;--g700:#334155;--g800:#1e293b}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#f0f4ff;color:var(--g800);font-size:15px;min-height:100vh}
+
+/* HEADER FIJO */
+#header{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--pd);color:#fff;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 8px rgba(0,0,0,.2)}
+#header-title{font-size:13px;font-weight:600;opacity:.9}
+#timer{font-size:22px;font-weight:800;letter-spacing:2px;
+  background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px}
+#timer.warn{background:#f59e0b;color:#fff;animation:pulse 1s infinite}
+#timer.danger{background:#dc2626;color:#fff;animation:pulse .5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+#prog-bar{position:fixed;top:52px;left:0;right:0;height:4px;background:rgba(255,255,255,.2);z-index:99}
+#prog-fill{height:100%;background:#60a5fa;transition:width .5s}
+
+/* CONTENIDO */
+#wrap{padding:70px 16px 100px;max-width:640px;margin:0 auto}
+
+/* PANTALLA INICIO */
+#screen-inicio{text-align:center;padding:40px 0}
+#screen-inicio .logo{font-size:48px;margin-bottom:12px}
+#screen-inicio h1{font-size:22px;font-weight:700;color:var(--pd);margin-bottom:6px}
+#screen-inicio p{color:var(--g500);font-size:14px;margin-bottom:24px;line-height:1.5}
+.sel-wrap{background:#fff;border-radius:12px;padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:16px;text-align:left}
+.sel-wrap label{display:block;font-size:12px;font-weight:700;
+  color:var(--g500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+select{width:100%;padding:10px 14px;border:2px solid var(--g200);
+  border-radius:8px;font-size:15px;color:var(--g800);background:#fff;outline:none}
+select:focus{border-color:var(--p)}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+  padding:14px 16px;margin-bottom:20px;font-size:13px;color:#1e40af;line-height:1.6}
+.info-box strong{display:block;margin-bottom:4px}
+.btn-start{width:100%;padding:16px;background:var(--p);color:#fff;
+  border:none;border-radius:10px;font-size:17px;font-weight:700;
+  cursor:pointer;transition:.15s;letter-spacing:.02em}
+.btn-start:hover{background:var(--pd)}
+.btn-start:disabled{background:var(--g300);cursor:not-allowed}
+
+/* PREGUNTAS */
+.bloque{background:#fff;border-radius:14px;padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:14px}
+.num-total{font-size:12px;color:var(--g400);text-align:right;margin-bottom:16px}
+.pregunta{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--g100)}
+.pregunta:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.preg-txt{font-size:14px;font-weight:500;color:var(--g800);
+  margin-bottom:12px;line-height:1.5}
+.preg-num{font-size:11px;color:var(--g400);margin-bottom:4px}
+
+/* ESCALA DE PUNTOS */
+.escala{display:flex;flex-direction:column;gap:6px}
+.escala-pts{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.pt{width:38px;height:38px;border-radius:50%;border:2px solid var(--g200);
+  background:#fff;font-size:14px;font-weight:700;color:var(--g400);
+  cursor:pointer;transition:.15s;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.pt:hover{border-color:var(--p);color:var(--p);background:#eff6ff}
+.pt.sel{border-color:var(--p);background:var(--p);color:#fff;
+  transform:scale(1.12);box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.escala-lbl{display:flex;justify-content:space-between;
+  font-size:10px;color:var(--g400);padding:0 2px}
+
+/* RESPUESTA ABIERTA */
+.resp-open{width:100%;padding:10px 12px;border:2px solid var(--g200);
+  border-radius:8px;font-size:14px;color:var(--g800);resize:vertical;
+  min-height:80px;outline:none;font-family:inherit}
+.resp-open:focus{border-color:var(--p)}
+
+/* SELECT OPCIONES */
+.resp-sel{width:100%;padding:10px 12px;border:2px solid var(--g200);
+  border-radius:8px;font-size:14px;color:var(--g800);outline:none;background:#fff}
+.resp-sel:focus{border-color:var(--p)}
+
+/* SECCIÓN SEPARADOR */
+.sec-header{text-align:center;padding:16px 0 8px;color:var(--g400);
+  font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+
+/* FOOTER FIJO */
+#footer{position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid var(--g200);
+  padding:12px 16px;z-index:100;
+  box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.footer-inner{max-width:640px;margin:0 auto;display:flex;
+  align-items:center;justify-content:space-between;gap:10px}
+.prog-text{font-size:12px;color:var(--g400)}
+.btn-env{flex:1;padding:13px;background:var(--g);color:#fff;
+  border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-env:hover{background:#047857}
+
+/* PANTALLA FIN */
+#screen-fin{text-align:center;padding:50px 0}
+#screen-fin .ico{font-size:64px;margin-bottom:16px}
+#screen-fin h2{font-size:22px;font-weight:700;color:var(--g);margin-bottom:8px}
+#screen-fin p{color:var(--g500);font-size:14px;line-height:1.6}
+
+/* ALERTA SIN RESPONDER */
+.sin-resp{border:2px solid var(--r)!important;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+@media(max-width:400px){
+  .pt{width:32px;height:32px;font-size:12px}
+  #timer{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <span id="header-title">Evaluación</span>
+  <span id="timer">60:00</span>
+</div>
+<div id="prog-bar"><div id="prog-fill" style="width:0%"></div></div>
+
+<div id="wrap">
+  <!-- INICIO -->
+  <div id="screen-inicio">
+    <div class="logo">📋</div>
+    <h1>Evaluación de Candidato</h1>
+    <p>Selecciona tu nombre y lee las instrucciones antes de comenzar.</p>
+
+    <div class="sel-wrap">
+      <label>Convocatoria</label>
+      <select id="sel-conv" onchange="onConvChange()">
+        <option value="">— Seleccionar convocatoria —</option>
+      </select>
+    </div>
+
+    <div class="sel-wrap">
+      <label>Tu nombre</label>
+      <select id="sel-cand" disabled>
+        <option value="">— Primero selecciona la convocatoria —</option>
+      </select>
+    </div>
+
+    <div class="info-box">
+      <strong>📌 Instrucciones importantes</strong>
+      Responde con sinceridad — no hay respuestas buenas ni malas.<br>
+      Tienes <strong>60 minutos</strong> para completar todas las secciones.<br>
+      Al finalizar el tiempo, tus respuestas se guardan automáticamente.<br>
+      No cierres esta pestaña mientras realizas la evaluación.
+    </div>
+
+    <button class="btn-start" id="btn-start" onclick="iniciarTest()" disabled>
+      Comenzar evaluación →
+    </button>
+  </div>
+
+  <!-- TEST (se genera dinámicamente) -->
+  <div id="screen-test" style="display:none"></div>
+
+  <!-- FIN -->
+  <div id="screen-fin" style="display:none">
+    <div class="ico">✅</div>
+    <h2>¡Evaluación completada!</h2>
+    <p>Tus respuestas han sido guardadas correctamente.<br>
+    Puedes cerrar esta pestaña y devolver el dispositivo.</p>
+  </div>
+</div>
+
+<!-- FOOTER (solo durante el test) -->
+<div id="footer" style="display:none">
+  <div class="footer-inner">
+    <span class="prog-text" id="prog-text">0 / 0 respondidas</span>
+    <button class="btn-env" onclick="enviarRespuestas(false)">✓ Enviar respuestas</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// DATOS DE TESTS
+// ══════════════════════════════════════
+var BIG5=[
+  {id:'b1',dim:'E',inv:false,txt:'Me veo como alguien extrovertido/a, entusiasta.'},
+  {id:'b2',dim:'A',inv:true, txt:'Me veo como alguien crítico/a, que suele discutir.'},
+  {id:'b3',dim:'C',inv:false,txt:'Me veo como alguien confiable, autodisciplinado/a.'},
+  {id:'b4',dim:'N',inv:true, txt:'Me veo como alguien relajado/a, que maneja bien el estrés.'},
+  {id:'b5',dim:'O',inv:false,txt:'Me veo como alguien abierto/a a nuevas experiencias, con imaginación.'},
+  {id:'b6',dim:'E',inv:true, txt:'Me veo como alguien reservado/a, tranquilo/a.'},
+  {id:'b7',dim:'A',inv:false,txt:'Me veo como alguien empático/a, afectuoso/a con los demás.'},
+  {id:'b8',dim:'C',inv:true, txt:'Me veo como alguien desorganizado/a, descuidado/a.'},
+  {id:'b9',dim:'N',inv:false,txt:'Me veo como alguien que se asusta fácilmente, ansioso/a.'},
+  {id:'b10',dim:'O',inv:true, txt:'Me veo como alguien que gusta de las rutinas, poco creativo/a.'}
+];
+
+var respuestas={};
+var candId='',convId='',started=false,timerSecs=0,timerInt=null;
+var MINS=60;
+
+function cargarConvs(){
+  try{var cs=JSON.parse(localStorage.getItem('rrhh_convs')||'[]');
+    var sel=document.getElementById('sel-conv');
+    cs.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.nombre;sel.appendChild(o);});
+  }catch(e){}
+}
+
+function onConvChange(){
+  convId=document.getElementById('sel-conv').value;
+  var candSel=document.getElementById('sel-cand');
+  candSel.innerHTML='<option value="">— Seleccionar candidato —</option>';
+  if(!convId){candSel.disabled=true;return;}
+  candSel.disabled=false;
+  try{var cs=JSON.parse(localStorage.getItem('rrhh_cands')||'[]');
+    cs.filter(function(c){return c.conv===convId;}).forEach(function(c){
+      var o=document.createElement('option');o.value=c.id;o.textContent=c.nombre;candSel.appendChild(o);
+    });
+  }catch(e){}
+  actualizarBoton();
+}
+
+function actualizarBoton(){
+  var sel=document.getElementById('sel-cand');
+  candId=sel.value;
+  var btn=document.getElementById('btn-start');
+  btn.disabled=!candId||!convId;
+}
+
+document.getElementById('sel-cand').addEventListener('change',actualizarBoton);
+
+function buildPregs(){
+  pregsTotal=[];
+  var i=0;
+  BIG5.forEach(function(p){pregsTotal.push({id:p.id,grupo:'big5',dim:p.dim,inv:p.inv,txt:p.txt,tipo:'escala'});});
+}
+
+var pregsTotal=[];
+
+function renderTest(){
+  var html='';
+  pregsTotal.forEach(function(p,idx){
+    html+='<div class="bloque" id="wrap_'+p.id+'">'
+      +'<div class="num-total">'+(idx+1)+' / '+pregsTotal.length+'</div>'
+      +'<div class="pregunta">'
+      +'<div class="preg-num">Pregunta '+(idx+1)+'</div>'
+      +'<div class="preg-txt">'+p.txt+'</div>';
+    if(p.tipo==='escala'){
+      html+='<div class="escala">'
+        +'<div class="escala-pts">';
+      for(var v=1;v<=5;v++){
+        html+='<button class="pt" id="pt_'+p.id+'_'+v+'" onclick="selPt(\''+p.id+'\','+v+',1,5)">'+v+'</button>';
+      }
+      html+='</div><div class="escala-lbl"><span>Totalmente en desacuerdo</span><span>Totalmente de acuerdo</span></div></div>';
+    } else if(p.opciones){
+      html+='<select class="resp-sel" id="resp_'+p.id+'" onchange="responder(\''+p.id+'\',this.value)">'
+        +'<option value="">— Seleccionar —</option>'
+        +p.opciones.map(function(o){return'<option>'+o+'</option>';}).join('')
+        +'</select>';
+    } else {
+      html+='<textarea class="resp-open" id="resp_'+p.id+'" rows="3" placeholder="Escribe tu respuesta..." oninput="responder(\''+p.id+'\',this.value)"></textarea>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('screen-test').innerHTML=html;
+  actualizarProgreso();
+}
+
+function selPt(pid,val,min,max){
+  respuestas[pid]=val;
+  for(var v=min;v<=max;v++){
+    var el=document.getElementById('pt_'+pid+'_'+v);
+    if(el)el.classList.toggle('sel',v===val);
+  }
+  var wrap=document.getElementById('wrap_'+pid);
+  if(wrap)wrap.querySelector('.escala-pts').classList.remove('sin-resp');
+  actualizarProgreso();
+}
+
+function responder(pid,val){
+  respuestas[pid]=val;
+  var wrap=document.getElementById('wrap_'+pid);
+  if(wrap){var el=wrap.querySelector('.resp-open,.resp-sel');if(el)el.classList.remove('sin-resp');}
+  actualizarProgreso();
+}
+
+function actualizarProgreso(){
+  var resp=Object.keys(respuestas).filter(function(k){
+    var v=respuestas[k];return v!==''&&v!==null&&v!==undefined;
+  }).length;
+  var total=pregsTotal.length;
+  var pct=Math.round(resp/total*100);
+  document.getElementById('prog-text').textContent=resp+' / '+total+' respondidas';
+  document.getElementById('prog-fill').style.width=pct+'%';
+}
+
+function startTimer(){
+  var startKey='rrhh_test_start_'+candId;
+  var saved=localStorage.getItem(startKey);
+  var startAt=saved?parseInt(saved):Date.now();
+  if(!saved)localStorage.setItem(startKey,startAt);
+
+  function tick(){
+    var elapsed=Math.floor((Date.now()-startAt)/1000);
+    var left=Math.max(0,MINS*60-elapsed);
+    timerSecs=left;
+    var m=Math.floor(left/60);
+    var s=left%60;
+    var t=document.getElementById('timer');
+    t.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    t.className=left<=300?'danger':left<=600?'warn':'';
+    if(left===0){clearInterval(timerInt);enviarRespuestas(true);}
+  }
+  tick();
+  timerInt=setInterval(tick,1000);
+}
+
+function iniciarTest(){
+  if(!candId||!convId){return;}
+  buildPregs();
+  document.getElementById('screen-inicio').style.display='none';
+  document.getElementById('screen-test').style.display='block';
+  document.getElementById('footer').style.display='block';
+  renderTest();
+  startTimer();
+  started=true;
+  window.onbeforeunload=function(){return'¿Seguro que quieres salir? Perderás tus respuestas no guardadas.';};
+}
+
+function enviarRespuestas(auto){
+  if(!auto){
+    var sinResp=pregsTotal.filter(function(p){
+      var v=respuestas[p.id];return v===''||v===null||v===undefined;
+    });
+    if(sinResp.length>0){
+      sinResp.forEach(function(p){
+        var wrap=document.getElementById('wrap_'+p.id);
+        if(!wrap)return;
+        if(p.tipo==='escala'){var ep=wrap.querySelector('.escala-pts');if(ep)ep.classList.add('sin-resp');}
+        else{var el=wrap.querySelector('.resp-open,.resp-sel');if(el)el.classList.add('sin-resp');}
+      });
+      var first=document.getElementById('wrap_'+sinResp[0].id);
+      if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+      mostrarMsg('Faltan '+sinResp.length+' pregunta(s) por responder','w');
+      return;
+    }
+  }
+
+  clearInterval(timerInt);
+  window.onbeforeunload=null;
+
+  var b5resps=pregsTotal.filter(function(p){return p.grupo==='big5';}).map(function(p){
+    return{id:p.id,dim:p.dim,val:respuestas[p.id]||3,inv:p.inv||false};
+  });
+  var b5dims={};
+  ['E','A','C','N','O'].forEach(function(d){
+    var items=b5resps.filter(function(r){return r.dim===d;});
+    var sum=items.reduce(function(s,r){return s+(r.inv?(6-r.val):r.val);},0);
+    b5dims[d]=items.length?Math.round(sum/items.length*10)/10:0;
+  });
+
+  var allRes=[];
+  try{allRes=JSON.parse(localStorage.getItem('rrhh_resultados')||'[]');}catch(e){}
+
+  function upsert(reg){
+    var idx=allRes.findIndex(function(x){return x.candId===reg.candId&&x.tipo===reg.tipo;});
+    if(idx>=0)allRes[idx]=reg;else allRes.push(reg);
+  }
+
+  upsert({candId:candId,tipo:'big5',resps:b5resps,dims:b5dims,fecha:hoy()});
+  localStorage.setItem('rrhh_resultados',JSON.stringify(allRes));
+  localStorage.removeItem('rrhh_test_start_'+candId);
+
+  document.getElementById('screen-test').style.display='none';
+  document.getElementById('footer').style.display='none';
+  document.getElementById('screen-fin').style.display='block';
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('header').style.background='#059669';
+  document.getElementById('header-title').textContent='¡Completado!';
+  document.getElementById('timer').textContent='✓';
+}
+
+function hoy(){return new Date().toISOString().split('T')[0];}
+
+function mostrarMsg(msg,tipo){
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'
+    +'background:'+(tipo==='w'?'#d97706':'#059669')+';color:#fff;padding:10px 18px;'
+    +'border-radius:10px;font-size:13px;font-weight:600;z-index:999;'
+    +'box-shadow:0 4px 12px rgba(0,0,0,.2);white-space:nowrap';
+  d.textContent=msg;
+  document.body.appendChild(d);
+  setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},3000);
+}
+
+cargarConvs();
+</script>
+</body>
+</html>
