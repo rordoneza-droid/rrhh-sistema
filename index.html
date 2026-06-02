@@ -859,9 +859,7 @@ function pgPresel(){
         +'<td><div class="flex g2">'
         +'<button class="btn bg bxs" onclick="moverC(\''+c.id+'\',\'preseleccionado\')">&#10003;</button>'
         +'<button class="btn br bxs" onclick="moverC(\''+c.id+'\',\'descartado_pre\')">&#10005;</button>'
-        +'<button class="btn bo bxs" style="background:#25D366;color:#fff" onclick="whatsappCand(\''+c.id+'\')">☏ WA</button>'
-        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">← Regresar</button>'
-        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">←</button>'
+        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">&#8592; Regresar</button>'
         +'<button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button>'
         +'</div></td></tr>';
     }).join('');
@@ -943,6 +941,8 @@ function pgSelec(){
         +'<button class="btn bo bxs" onclick="modalPrueba(\''+c.id+'\')">+ Prueba</button>'
         +'<button class="btn bg bxs" onclick="moverC(\''+c.id+'\',\'en_entrevista\')">-> Entrev.</button>'
         +'<button class="btn br bxs" onclick="moverC(\''+c.id+'\',\'descartado_sel\')">&#10005;</button>'
+        +'<button class="btn bxs" style="background:#25D366;color:#fff;border:none" onclick="whatsappCand(\''+c.id+'\')">&#128241; WA</button>'
+        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">&#8592; Regresar</button>'
         +'<button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button>'
         +'</div></td></tr>';
     }).join('');
@@ -1006,7 +1006,11 @@ function pgEntrev(){
         +'<td>'+(prom!=null?'<span class="bdg '+sCls(prom)+'">'+prom+'%</span>':'Pendiente')+'</td>'
         +'<td>'+(tot!=null?'<span class="bdg '+sCls(tot)+'">'+tot+'%</span>':'-')+'</td>'
         +'<td><span class="bdg '+(EB[c.etapa]||'b-gr')+'">'+(EL[c.etapa]||c.etapa)+'</span></td>'
-        +'<td><div class="flex g2"><button class="btn bo bxs" onclick="modalEnt(\''+c.id+'\')">+ Entrev.</button><button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button></div></td></tr>';
+        +'<td><div class="flex g2">'
+        +'<button class="btn bo bxs" onclick="modalEnt(\''+c.id+'\')">+ Entrev.</button>'
+        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">&#8592; Regresar</button>'
+        +'<button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button>'
+        +'</div></td></tr>';
     }).join('');
     body='<div class="flex g2 mb3"><button class="btn bp bxs" onclick="defFinals(\''+entC+'\')">Definir Finalistas</button></div>'
       +'<div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Presel.</th><th>Selec.</th><th>Entrev.</th><th>Total</th><th>Etapa</th><th></th></tr></thead>'
