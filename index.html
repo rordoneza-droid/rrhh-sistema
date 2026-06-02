@@ -344,12 +344,37 @@ function closeMO(e) { if (e.target === document.getElementById('mo')) closeM(); 
 function toggleSB() { document.getElementById('sb').classList.toggle('open'); }
 function closeSB() { document.getElementById('sb').classList.remove('open'); }
 
-// ━━━ INIT ━━━
+// ━━━ INIT CON MIGRACIÓN ━━━
 (async () => {
-  await DB.load('perfiles').then(d => cache.perfiles = d);
-  await DB.load('convs').then(d => cache.convs = d);
-  await DB.load('cands').then(d => cache.cands = d);
-  go('home');
+  go('home'); // Mostrar página AHORA
+  
+  // Cargar de localStorage PRIMERO (si existen datos viejos)
+  const tablas = ['perfiles', 'convs', 'cands', 'forms', 'resultados'];
+  tablas.forEach(tabla => {
+    try {
+      const local = JSON.parse(localStorage.getItem('rrhh_' + tabla) || 'null');
+      if (local && Array.isArray(local) && local.length > 0) {
+        cache[tabla] = local;
+        DB.save(tabla, local); // Guardar a Firebase automáticamente
+        console.log('✓ Migrado a Firebase:', tabla, local.length, 'items');
+      }
+    } catch(e) { console.warn('Error al leer', tabla); }
+  });
+  
+  // Luego cargar desde Firebase (con timeout máximo 3 seg)
+  const loadTimeout = setTimeout(() => {
+    console.warn('Firebase timeout, usando cache local');
+    go(curPage);
+  }, 3000);
+  
+  await Promise.all([
+    DB.load('perfiles').then(d => { cache.perfiles = d; clearTimeout(loadTimeout); }),
+    DB.load('convs').then(d => { cache.convs = d; clearTimeout(loadTimeout); }),
+    DB.load('cands').then(d => { cache.cands = d; clearTimeout(loadTimeout); })
+  ]);
+  
+  clearTimeout(loadTimeout);
+  go(curPage);
 })();
 </script>
 </body>
