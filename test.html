@@ -28,7 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 #prog-fill{height:100%;background:#60a5fa;transition:width .5s}
 
 /* CONTENIDO */
-#wrap{padding:70px 16px 100px;max-width:640px;margin:0 auto}
+#wrap{padding:70px 16px 100px;max-width:900px;margin:0 auto}
 
 /* PANTALLA INICIO */
 #screen-inicio{text-align:center;padding:40px 0}
@@ -175,6 +175,33 @@ select:focus{border-color:var(--p)}
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
+<script>
+// ── FIREBASE CONFIG ────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyB9bOIeXc1OBYa0Vsst6EDV0TxyPt121XU",
+  authDomain: "rrhh-sistema-87426.firebaseapp.com",
+  databaseURL: "https://rrhh-sistema-87426-default-rtdb.firebaseio.com",
+  projectId: "rrhh-sistema-87426",
+  storageBucket: "rrhh-sistema-87426.firebasestorage.app",
+  messagingSenderId: "432686202734",
+  appId: "1:432686202734:web:21f822d71754688d328b7f"
+};
+const fbApp = firebase.initializeApp(firebaseConfig);
+const fbdb = firebase.database();
+
+// ── AUTOSAVE A FIREBASE ────────────────
+function autoSaveToFirebase(candId, tipo, datos){
+  try {
+    fbdb.ref('rrhh/resultados/' + candId + '/' + tipo).set(datos).catch(function(err){
+      console.warn('Firebase save error:', err.message);
+    });
+  } catch(e){console.warn('Firebase error:', e);}
+}
+
+// ── DATOS DE TESTS
+</script>
 <script>
 // ══════════════════════════════════════
 // DATOS DE TESTS
@@ -425,6 +452,8 @@ function enviarRespuestas(auto){
   function upsert(reg){
     var idx=allRes.findIndex(function(x){return x.candId===reg.candId&&x.tipo===reg.tipo;});
     if(idx>=0)allRes[idx]=reg;else allRes.push(reg);
+    // Autosave a Firebase
+    autoSaveToFirebase(reg.candId, reg.tipo, reg);
   }
 
   var b5resps=pregsTotal.filter(function(p){return p.grupo==='big5';}).map(function(p){
@@ -455,6 +484,8 @@ function enviarRespuestas(auto){
   upsert({candId:candId,tipo:'entrevista',resps:etresps,fecha:hoy()});
 
   localStorage.setItem('rrhh_resultados',JSON.stringify(allRes));
+  // Guardar resultado final a Firebase
+  autoSaveToFirebase(candId, 'completado', {completado:true, fecha:hoy()});
   localStorage.removeItem('rrhh_test_start_'+candId);
 
   document.getElementById('screen-test').style.display='none';

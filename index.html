@@ -168,7 +168,23 @@ tr:hover td{background:var(--g50)}
     <div class="mf" id="mf"></div>
   </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
 <script>
+// ── FIREBASE CONFIG ────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyB9bOIeXc1OBYa0Vsst6EDV0TxyPt121XU",
+  authDomain: "rrhh-sistema-87426.firebaseapp.com",
+  databaseURL: "https://rrhh-sistema-87426-default-rtdb.firebaseio.com",
+  projectId: "rrhh-sistema-87426",
+  storageBucket: "rrhh-sistema-87426.firebasestorage.app",
+  messagingSenderId: "432686202734",
+  appId: "1:432686202734:web:21f822d71754688d328b7f"
+};
+const fbApp = firebase.initializeApp(firebaseConfig);
+const fbdb = firebase.database();
+console.log('Firebase inicializado');
+
 // ── TOAST ──────────────────────────────────────
 function toast(msg,type,ms){
   ms=ms||3000;
@@ -187,7 +203,7 @@ function saveCfg(c){localStorage.setItem('rrhh_cfg',JSON.stringify(c));updateLog
 var DB={
   _c:{},
   get:function(t){if(this._c[t])return this._c[t];try{this._c[t]=JSON.parse(localStorage.getItem('rrhh_'+t)||'[]')}catch(e){this._c[t]=[];}return this._c[t];},
-  save:function(t,d){this._c[t]=d;localStorage.setItem('rrhh_'+t,JSON.stringify(d));schedSync(t);},
+  save:function(t,d){this._c[t]=d;localStorage.setItem('rrhh_'+t,JSON.stringify(d));syncToFirebase(t,d);},
   perfiles:function(){return this.get('perfiles');},
   convs:function(){return this.get('convs');},
   cands:function(){return this.get('cands');},
@@ -195,6 +211,38 @@ var DB={
   sConvs:function(d){this.save('convs',d);},
   sCands:function(d){this.save('cands',d);}
 };
+
+// ── FIREBASE SYNC ──────────────────────────────
+function syncToFirebase(tabla, datos){
+  try {
+    fbdb.ref('rrhh/' + tabla).set(datos).catch(function(err){
+      console.warn('Firebase sync error:', err.message);
+    });
+  } catch(e){console.warn('Firebase error:', e);}
+}
+
+function loadFromFirebase(){
+  try {
+    fbdb.ref('rrhh').once('value').then(function(snapshot){
+      var data = snapshot.val();
+      if(!data) return;
+      ['perfiles','convs','cands','forms','resultados'].forEach(function(t){
+        if(data[t]){
+          localStorage.setItem('rrhh_'+t, JSON.stringify(data[t]));
+          DB._c[t] = data[t];
+        }
+      });
+      console.log('✓ Datos cargados desde Firebase');
+      go(curPage);
+    }).catch(function(err){
+      console.warn('No Firebase data:', err.message);
+      go(curPage);
+    });
+  } catch(e){
+    console.warn('Firebase load error:', e);
+    go(curPage);
+  }
+}
 
 // ── GITHUB SYNC ────────────────────────────────
 var _syncT={},_shas={};
@@ -1636,7 +1684,8 @@ pullGH=function(){
 };
 (function init(){
   updateLogo();
-  go('home'); // render immediately — never block on network
+  // Cargar desde Firebase primero
+  loadFromFirebase();
   var c=getCfg();
   if(c.tok&&c.own&&c.repo){
     setSS('ing');
