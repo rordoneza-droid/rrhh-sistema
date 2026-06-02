@@ -244,7 +244,39 @@ function pgHome() {
 }
 
 function pgCfg() {
-  document.getElementById('ct').innerHTML = '<div class="card"><div class="cb"><p>Configuración de empresa (Firebase Time Real)</p></div></div>';
+  var cfg = JSON.parse(localStorage.getItem('rrhh_cfg') || '{}');
+  document.getElementById('ct').innerHTML = `
+    <div class="card"><div class="ch"><span class="ct2">Configuración de Empresa</span></div>
+    <div class="cb">
+      <div class="fr fr2">
+        <div class="fg"><label>Empresa</label><input id="cfg_emp" value="${cfg.empresa || ''}"></div>
+        <div class="fg"><label>RUC</label><input id="cfg_ruc" value="${cfg.ruc || ''}"></div>
+      </div>
+      <div class="fr fr2">
+        <div class="fg"><label>Dirección</label><input id="cfg_dir" value="${cfg.direccion || ''}"></div>
+        <div class="fg"><label>Ciudad</label><input id="cfg_ciu" value="${cfg.ciudad || ''}"></div>
+      </div>
+      <div class="fr fr2">
+        <div class="fg"><label>Director RRHH</label><input id="cfg_drrhh" value="${cfg.dirRRHH || ''}"></div>
+        <div class="fg"><label>Representante Legal</label><input id="cfg_rep" value="${cfg.repLegal || ''}"></div>
+      </div>
+      <button class="btn bp" onclick="saveCfgEmp()">Guardar Empresa</button>
+    </div></div>
+  `;
+}
+
+function saveCfgEmp() {
+  var cfg = {
+    empresa: document.getElementById('cfg_emp').value.trim(),
+    ruc: document.getElementById('cfg_ruc').value.trim(),
+    direccion: document.getElementById('cfg_dir').value.trim(),
+    ciudad: document.getElementById('cfg_ciu').value.trim(),
+    dirRRHH: document.getElementById('cfg_drrhh').value.trim(),
+    repLegal: document.getElementById('cfg_rep').value.trim()
+  };
+  localStorage.setItem('rrhh_cfg', JSON.stringify(cfg));
+  toast('Empresa guardada', 'ok');
+  pgCfg();
 }
 
 function pgPerfiles() {
