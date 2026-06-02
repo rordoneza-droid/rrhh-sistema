@@ -948,8 +948,8 @@ function pgSelec(){
         +'<button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button>'
         +'</div></td></tr>';
     }).join('');
-    body='<div class="flex g2 mb3" style="flex-wrap:wrap"><button class="btn bp bxs" onclick="pasarEntrev(\''+selC+'\')">-> Pasar a Entrevistas</button><button class="btn bg bxs" onclick="abrirTestCandidato()">📋 Abrir Evaluación Digital</button><button class="btn bo bxs" onclick="go(\'forms\')">⚙️ Config. Tests</button></div>'
-      +'<div class="al al-s" style="margin-bottom:12px">Configura tu Google Form en la sección "Tests". Los candidatos responderán allí cuando hagan clic en "Abrir Evaluación Digital".</div>'
+    body='<div class="flex g2 mb3" style="flex-wrap:wrap"><button class="btn bp bxs" onclick="pasarEntrev(\''+selC+'\')">-> Pasar a Entrevistas</button><button class="btn bg bxs" onclick="abrirTestCandidato()">📋 Abrir Evaluación Digital</button></div>'
+      +'<div class="al al-s" style="margin-bottom:12px">Haz clic en "Abrir Evaluación Digital" para que el candidato complete los tests (Big Five, Screening, Cargo e Entrevista). Tiempo límite: 60 minutos.</div>'
       +'<div class="card"><div class="tw"><table><thead><tr><th>Candidato</th><th>Presel.</th><th>Pruebas</th><th>Promedio</th><th>Etapa</th><th>Acciones</th></tr></thead>'
       +'<tbody>'+(rows||'<tr><td colspan="6" class="tgr" style="text-align:center;padding:20px">Sin candidatos</td></tr>')+'</tbody></table></div></div>';
   }
@@ -1330,7 +1330,7 @@ DB.sResultados=function(d){this.save('resultados',d);};
 // ── PÁGINA PRINCIPAL FORMULARIOS ───────────────────────
 var formsTab=0;
 function pgForms(){
-  document.getElementById('tb-act').innerHTML='<button class="btn bo bs" onclick="abrirConfigForm()">⚙️ Configurar Google Form</button>';
+  document.getElementById('tb-act').innerHTML='';
   var tabs=['&#129504; Psicométrico (Big Five)','&#129488; Psicológico (Screening)','&#128203; Por Cargo','&#127908; Entrevista Estándar'];
   var tabsH=tabs.map(function(t,i){return'<div class="tab'+(formsTab===i?' on':'')+'" onclick="formsTab='+i+';pgForms()">'+t+'</div>';}).join('');
   var body='';
@@ -1339,23 +1339,6 @@ function pgForms(){
   else if(formsTab===2)body=renderCargoPanelForms();
   else if(formsTab===3)body=renderEntPanel();
   document.getElementById('ct').innerHTML='<div class="tabs">'+tabsH+'</div>'+body;
-}
-
-// ── CONFIGURAR GOOGLE FORM ────────────────────────────────────
-function abrirConfigForm(){
-  var idActual=localStorage.getItem('rrhh_form_id')||'';
-  openM('⚙️ Configurar Google Form para Tests','<div class="al al-i" style="margin-bottom:16px"><strong>Instrucciones:</strong><br>1. Ve a tu Google Form<br>2. Copia el ID de la URL<br><br>Ejemplo de URL:<br><code style="background:#f1f5f9;padding:4px 8px;border-radius:4px;font-size:11px">https://docs.google.com/forms/d/<u>1abc123XyZ_pqr456</u>/viewform</code><br><br>El ID es lo que está entre <strong>/d/</strong> y <strong>/viewform</strong></div>'
-    +'<div class="fg"><label>ID del Google Form <span class="rq">*</span></label><input type="text" id="cfg-form-id" placeholder="Pega aquí: 1abc123XyZ_pqr456" style="font-family:monospace;font-size:12px" value="'+idActual+'"></div>'
-    +'<div class="mf"><button class="btn br" onclick="closeM()">Cancelar</button><button class="btn bg" onclick="guardarConfigForm()">✓ Guardar</button></div>','');
-  setTimeout(function(){var e=document.getElementById('cfg-form-id');if(e)e.focus();},100);
-}
-
-function guardarConfigForm(){
-  var id=document.getElementById('cfg-form-id').value.trim();
-  if(!id){alert('⚠️ Debes pegar el ID del formulario');return;}
-  localStorage.setItem('rrhh_form_id',id);
-  closeM();
-  toast('✓ Google Form configurado','ok');
 }
 
 // ── BIG FIVE PANEL ─────────────────────────────────────
@@ -1628,15 +1611,8 @@ function guardarTest(candId,tipo){
 
 // ── ABRIR TEST EN NUEVA PESTAÑA ────────────────────────
 function abrirTestCandidato(){
-  var formId=localStorage.getItem('rrhh_form_id');
-  if(!formId){
-    openM('⚠️ Google Form no configurado',
-      '<div class="al al-w">Primero debes configurar tu Google Form para que los candidatos puedan responder los tests.<br><br>Ve a la sección "Tests" y haz clic en "⚙️ Configurar Google Form".</div>',
-      '<button class="btn br" onclick="closeM()">Cerrar</button><button class="btn bp" onclick="closeM();go(\'forms\');setTimeout(function(){abrirConfigForm();},200)">⚙️ Configurar ahora</button>');
-    return;
-  }
-  var googleFormUrl='https://docs.google.com/forms/d/'+formId+'/viewform';
-  window.open(googleFormUrl,'_blank');
+  var url='test.html';
+  window.open(url,'_blank');
 }
 
 // ── GitHub sync extensión para nuevas tablas ───────────
