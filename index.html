@@ -859,6 +859,9 @@ function pgPresel(){
         +'<td><div class="flex g2">'
         +'<button class="btn bg bxs" onclick="moverC(\''+c.id+'\',\'preseleccionado\')">&#10003;</button>'
         +'<button class="btn br bxs" onclick="moverC(\''+c.id+'\',\'descartado_pre\')">&#10005;</button>'
+        +'<button class="btn bo bxs" style="background:#25D366;color:#fff" onclick="whatsappCand(\''+c.id+'\')">☏ WA</button>'
+        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">← Regresar</button>'
+        +'<button class="btn bo bxs" onclick="regresarEtapa(\''+c.id+'\')">←</button>'
         +'<button class="btn bw bxs" onclick="overrideD(\''+c.id+'\')">Dir.</button>'
         +'</div></td></tr>';
     }).join('');
@@ -1151,6 +1154,81 @@ function updCompTotal(){
   if(el){el.textContent='Total: '+total+'%';el.style.color=total===100?'var(--g)':'var(--r)';}
 }
 
+// -- WHATSAPP --
+function whatsappCand(candId){
+  var c=DB.cands().find(function(x){return x.id===candId;});if(!c)return;
+  var conv=DB.convs().find(function(x){return x.id===c.convocatoriaId;});
+  var tel=(c.telefono||'').replace(/[^0-9]/g,'');
+  if(!tel){toast('Sin telefono registrado','err');return;}
+  openM('Invitacion WhatsApp',
+    '<div class="al al-i">WhatsApp se abrira con el mensaje listo.</div>'
+    +'<div class="fg"><label>Candidato</label><input disabled value="'+c.nombres+' '+c.apellidos+'"></div>'
+    +'<div class="fr fr2">'
+    +'<div class="fg"><label>Fecha</label><input type="date" id="wa_f" value="'+today()+'"></div>'
+    +'<div class="fg"><label>Hora</label><input type="time" id="wa_h" value="09:00"></div></div>'
+    +'<div class="fg"><label>Lugar</label><input id="wa_l" value="Nuestras oficinas"></div>'
+    +'<div class="fg"><label>Mensaje</label><textarea id="wa_msg" rows="8" style="font-size:11px;background:var(--g50)"></textarea></div>',
+    '<button class="btn bo" onclick="closeM()">Cancelar</button><button class="btn bg" id="wa_btn_ok">&#128241; Abrir WhatsApp</button>');
+  setTimeout(function(){
+    buildWAMsg(c,conv);
+    ['wa_f','wa_h','wa_l'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el)el.addEventListener('input',function(){buildWAMsg(c,conv);});
+    });
+    var btn=document.getElementById('wa_btn_ok');
+    if(btn)btn.addEventListener('click',function(){doWA(tel);});
+  },60);
+}
+function buildWAMsg(c,conv){
+  var f=document.getElementById('wa_f'),h=document.getElementById('wa_h'),l=document.getElementById('wa_l');
+  var cfg=getCfg();
+  var fd=f&&f.value?new Date(f.value+'T12:00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'-';
+  var lines=[
+    'Estimado/a '+c.nombres+' '+c.apellidos+',',
+    '',
+    'Le informamos que ha clasificado para el proceso de: *'+(conv?conv.titulo:'la vacante')+'*'+(cfg.empresa?' en '+cfg.empresa:'')+'.',
+    '',
+    'Su entrevista esta programada:',
+    'Fecha: '+fd,
+    'Hora: '+(h?h.value:'-'),
+    'Lugar: '+(l?l.value:'-'),
+    '',
+    'Por favor responda confirmando con: *SI CONFIRMO* o *NO PODRE ASISTIR*.',
+    '',
+    'Traer hoja de vida impresa y cedula.',
+    '',
+    'Saludos,',
+    (cfg.dirRRHH||'RRHH')+(cfg.empresa?' - '+cfg.empresa:'')
+  ];
+  var el=document.getElementById('wa_msg');
+  if(el)el.value=lines.join('\n');
+}
+function doWA(tel){
+  var el=document.getElementById('wa_msg');if(!el)return;
+  var num=tel.replace(/^0/,'');
+  var url='https://wa.me/593'+num+'?text='+encodeURIComponent(el.value);
+  window.open(url,'_blank');
+  closeM();toast('WhatsApp abierto','ok');
+}
+// -- REGRESAR ETAPA --
+var EPREV={preseleccionado:'postulado',descartado_pre:'postulado',en_seleccion:'preseleccionado',
+  descartado_sel:'en_seleccion',en_entrevista:'en_seleccion',finalista:'en_entrevista',
+  reserva:'en_entrevista',seleccionado:'finalista',descartado_final:'en_entrevista'};
+function regresarEtapa(candId){
+  var all=DB.cands();var idx=-1;
+  all.forEach(function(c,i){if(c.id===candId)idx=i;});
+  if(idx<0)return;
+  var prev=EPREV[all[idx].etapa];
+  if(!prev){toast('No hay etapa anterior','err');return;}
+  if(!confirm('Regresar a: '+EL[prev]+'?'))return;
+  all[idx].etapa=prev;
+  all[idx].puntajeTotal=calcTot(all[idx]);
+  DB.sCands(all);toast('Regresado a '+EL[prev],'ok');
+  if(curPage==='presel')pgPresel();
+  else if(curPage==='selec')pgSelec();
+  else if(curPage==='entrev')pgEntrev();
+  else if(curPage==='informe')pgInforme();
+}
 // ── INIT ───────────────────────────────────────
 (function init(){
   updateLogo();
