@@ -269,7 +269,7 @@ var MINS=60;
 function cargarConvs(){
   try{var cs=JSON.parse(localStorage.getItem('rrhh_convs')||'[]');
     var sel=document.getElementById('sel-conv');
-    cs.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.nombre;sel.appendChild(o);});
+    cs.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.titulo;sel.appendChild(o);});
   }catch(e){}
 }
 
@@ -281,7 +281,7 @@ document.getElementById('sel-conv').addEventListener('change',function(){
   candSel.disabled=false;
   try{var cs=JSON.parse(localStorage.getItem('rrhh_cands')||'[]');
     cs.filter(function(c){return c.convocatoriaId===convId;}).forEach(function(c){
-      var o=document.createElement('option');o.value=c.id;o.textContent=c.nombre;candSel.appendChild(o);
+      var o=document.createElement('option');o.value=c.id;o.textContent=c.apellidos+', '+c.nombres;candSel.appendChild(o);
     });
   }catch(e){}
   actualizarBoton();
