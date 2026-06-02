@@ -10,33 +10,18 @@
 :root{--p:#2563eb;--pd:#1e40af;--g:#059669;--r:#dc2626;--w:#d97706;
   --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
   --g400:#94a3b8;--g500:#64748b;--g700:#334155;--g800:#1e293b}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#f0f4ff;color:var(--g800);font-size:15px;min-height:100vh}
-
-/* HEADER FIJO */
-#header{position:fixed;top:0;left:0;right:0;z-index:100;
-  background:var(--pd);color:#fff;padding:10px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 2px 8px rgba(0,0,0,.2)}
-#header-title{font-size:13px;font-weight:600;opacity:.9}
-#timer{font-size:22px;font-weight:800;letter-spacing:2px;
-  background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px}
-#timer.warn{background:#f59e0b;color:#fff;animation:pulse 1s infinite}
-#timer.danger{background:#dc2626;color:#fff;animation:pulse .5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
-#prog-bar{position:fixed;top:52px;left:0;right:0;height:4px;background:rgba(255,255,255,.2);z-index:99}
-#prog-fill{height:100%;background:#60a5fa;transition:width .5s}
-
 /* CONTENIDO */
-#wrap{padding:70px 16px 100px;max-width:900px;margin:0 auto}
+#wrap{padding:70px 16px 120px;max-width:900px;margin:0 auto;width:100%;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#f0f4ff;color:var(--g800);font-size:15px;height:auto;overflow-x:hidden}
 
 /* PANTALLA INICIO */
-#screen-inicio{text-align:center;padding:40px 0}
+#screen-inicio{text-align:center;padding:40px 0;width:100%;min-width:100%}
 #screen-inicio .logo{font-size:48px;margin-bottom:12px}
 #screen-inicio h1{font-size:22px;font-weight:700;color:var(--pd);margin-bottom:6px}
-#screen-inicio p{color:var(--g500);font-size:14px;margin-bottom:24px;line-height:1.5}
+#screen-inicio p{color:var(--g500);font-size:14px;margin-bottom:24px;line-height:1.5;width:100%}
 .sel-wrap{background:#fff;border-radius:12px;padding:20px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:16px;text-align:left}
+  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:16px;text-align:left;width:100%;box-sizing:border-box}
 .sel-wrap label{display:block;font-size:12px;font-weight:700;
   color:var(--g500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 select{width:100%;padding:10px 14px;border:2px solid var(--g200);
@@ -153,6 +138,21 @@ select:focus{border-color:var(--p)}
     <button class="btn-start" id="btn-start" onclick="iniciarTest()" disabled>
       Comenzar evaluación →
     </button>
+
+    <div style="margin-top:20px;padding:16px;background:#fff3cd;border-radius:10px;border:1px solid #ffc107">
+      <details style="cursor:pointer">
+        <summary style="font-weight:700;color:#856404">🔄 Resetear Candidato (solo para pruebas)</summary>
+        <div style="margin-top:12px">
+          <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--g700)">Selecciona candidato a resetear:</label>
+          <select id="sel-reset" style="margin-bottom:10px;width:100%;padding:10px 12px;border:2px solid var(--g200);border-radius:8px;font-size:15px;color:var(--g800);background:#fff;outline:none">
+            <option value="">— Selecciona candidato —</option>
+          </select>
+          <button onclick="resetearCandidato()" style="width:100%;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+            ⚠️ Borrar datos de este candidato
+          </button>
+        </div>
+      </details>
+    </div>
   </div>
 
   <!-- TEST (se genera dinámicamente) -->
@@ -316,12 +316,29 @@ document.getElementById('sel-conv').addEventListener('change',function(){
 
 document.getElementById('sel-cand').addEventListener('change',function(){
   candId=this.value;
+  // Limpiar timer si existe cuando cambia de candidato
+  if(timerInt)clearInterval(timerInt);
+  document.getElementById('timer').textContent='60:00';
+  document.getElementById('timer').className='';
   actualizarBoton();
 });
 
 function actualizarBoton(){
   var btn=document.getElementById('btn-start');
   btn.disabled=!candId||!convId;
+}
+
+function llenarSelectorReset(){
+  try{
+    var cands=JSON.parse(localStorage.getItem('rrhh_cands')||'[]');
+    var sel=document.getElementById('sel-reset');
+    cands.forEach(function(c){
+      var o=document.createElement('option');
+      o.value=c.id;
+      o.textContent=c.apellidos+', '+c.nombres;
+      sel.appendChild(o);
+    });
+  }catch(e){}
 }
 
 function buildPregs(){
@@ -395,8 +412,18 @@ function actualizarProgreso(){
 function startTimer(){
   var startKey='rrhh_test_start_'+candId;
   var saved=localStorage.getItem(startKey);
-  var startAt=saved?parseInt(saved):Date.now();
-  if(!saved)localStorage.setItem(startKey,startAt);
+  var startAt;
+  
+  // Si existe tiempo guardado para este candidato, lo usa
+  // Si no existe, inicia nuevo con 60 minutos
+  if(saved){
+    startAt=parseInt(saved);
+    console.log('✓ Recuperando tiempo para candidato: '+candId);
+  }else{
+    startAt=Date.now();
+    localStorage.setItem(startKey,startAt);
+    console.log('✓ Iniciando 60 minutos para candidato: '+candId);
+  }
 
   function tick(){
     var elapsed=Math.floor((Date.now()-startAt)/1000);
@@ -423,6 +450,24 @@ function iniciarTest(){
   startTimer();
   started=true;
   window.onbeforeunload=function(){return'¿Seguro que quieres salir? Perderás tus respuestas no guardadas.';};
+}
+
+function resetearCandidato(){
+  var candIdReset=document.getElementById('sel-reset').value;
+  if(!candIdReset){alert('Selecciona un candidato');return;}
+  if(!confirm('⚠️ Esto borrará TODOS los datos de este candidato.\n¿Continuar?')){return;}
+  
+  // Borrar del localStorage
+  var allRes=JSON.parse(localStorage.getItem('rrhh_resultados')||'[]');
+  allRes=allRes.filter(function(r){return r.candId!==candIdReset;});
+  localStorage.setItem('rrhh_resultados',JSON.stringify(allRes));
+  
+  // Borrar timestamp de inicio
+  localStorage.removeItem('rrhh_test_start_'+candIdReset);
+  
+  alert('✓ Datos del candidato eliminados. Puede volver a hacer el test.');
+  document.getElementById('sel-reset').value='';
+  location.reload();
 }
 
 function enviarRespuestas(auto){
@@ -500,6 +545,7 @@ function enviarRespuestas(auto){
 function hoy(){return new Date().toISOString().split('T')[0];}
 
 cargarConvs();
+llenarSelectorReset();
 </script>
 </body>
 </html>
