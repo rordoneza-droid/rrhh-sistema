@@ -373,7 +373,7 @@ function renderTest(){
     } else if(p.tipo==='texto'){
       html+='<textarea class="resp-open" id="resp_'+p.id+'" placeholder="Escribe tu respuesta..." oninput="responder(\''+p.id+'\',this.value)"></textarea>';
     }
-    html+='</div>';
+    html+='</div></div>'; // CIERRA pregunta Y bloque
   });
   document.getElementById('screen-test').innerHTML=html;
   actualizarProgreso();
