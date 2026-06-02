@@ -11,12 +11,12 @@
   --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
   --g400:#94a3b8;--g500:#64748b;--g700:#334155;--g800:#1e293b}
 /* CONTENIDO */
-#wrap{padding:70px 16px 120px;width:100%!important;margin:0 auto!important;max-width:none!important}
-#screen-test{width:100%!important;display:block!important;margin:0!important;padding:0!important}
+#wrap{padding:70px 16px 120px;width:100%!important;margin:0 auto!important;max-width:none!important;height:auto!important;display:block!important}
+#screen-test{width:100%!important;display:block!important;margin:0!important;padding:0!important;height:auto!important}
 .bloque{background:#fff;border-radius:14px;padding:20px;
-  box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:14px;width:100%!important;box-sizing:border-box!important;max-width:none!important}
+  box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:14px;width:100%!important;box-sizing:border-box!important;max-width:none!important;height:auto!important;overflow:visible!important;display:block!important}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#f0f4ff;color:var(--g800);font-size:15px;overflow-x:hidden}
+  background:#f0f4ff;color:var(--g800);font-size:15px;overflow-x:hidden!important;overflow-y:auto!important;height:auto!important}
 /* PANTALLA INICIO */
 #screen-inicio{text-align:center;padding:40px 0;width:100%!important}
 #screen-inicio .logo{font-size:48px;margin-bottom:12px}
@@ -38,7 +38,7 @@ select:focus{border-color:var(--p)}
 .btn-start:hover{background:var(--pd)}
 .btn-start:disabled{background:var(--g300);cursor:not-allowed}
 .num-total{font-size:12px;color:var(--g400);text-align:right;margin-bottom:16px}
-.pregunta{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--g100)}
+.pregunta{height:auto!important;display:block!important;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--g100)}
 .pregunta:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .preg-txt{font-size:14px;font-weight:500;color:var(--g800);
   margin-bottom:12px;line-height:1.5}
