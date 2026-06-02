@@ -495,10 +495,9 @@ function enviarRespuestas(auto){
   function upsert(reg){
     var idx=allRes.findIndex(function(x){return x.candId===reg.candId&&x.tipo===reg.tipo;});
     if(idx>=0)allRes[idx]=reg;else allRes.push(reg);
-    // Autosave a Firebase
-    autoSaveToFirebase(reg.candId, reg.tipo, reg);
   }
 
+  // ── BIG FIVE ─────────────────────────────────
   var b5resps=pregsTotal.filter(function(p){return p.grupo==='big5';}).map(function(p){
     return{id:p.id,dim:p.dim,val:respuestas[p.id]||3,inv:p.inv||false};
   });
@@ -508,27 +507,38 @@ function enviarRespuestas(auto){
     var sum=items.reduce(function(s,r){return s+(r.inv?(6-r.val):r.val);},0);
     b5dims[d]=items.length?Math.round(sum/items.length*10)/10:0;
   });
+  upsert({candId:candId,tipo:'big5',resps:b5resps,dims:b5dims,fecha:hoy()});
 
+  // ── SCL PSICOLÓGICO (escala 1-5 → convertir a 0-4 + calcular dims) ───
   var scresps=pregsTotal.filter(function(p){return p.grupo==='screening';}).map(function(p){
-    return{id:p.id,dim:p.dim,val:respuestas[p.id]||0};
+    var rawVal=respuestas[p.id]||1;
+    return{id:p.id,dim:p.dim,val:rawVal-1}; // 1-5 → 0-4
   });
+  var sclDims={};
+  ['SOM','ANS','DEP','HOH'].forEach(function(d){
+    var items=scresps.filter(function(r){return r.dim===d;});
+    sclDims[d]=items.length?Math.round(items.reduce(function(s,r){return s+r.val;},0)/items.length*10)/10:0;
+  });
+  upsert({candId:candId,tipo:'scl',resps:scresps,dims:sclDims,fecha:hoy()});
 
+  // ── CARGO (calcular puntaje de respuestas correctas) ──────────────────
   var caresps=pregsTotal.filter(function(p){return p.grupo==='cargo';}).map(function(p){
-    return{txt:p.txt,resp:respuestas[p.id]||'',correcta:p.correcta};
+    var sel=respuestas[p.id]!==undefined&&respuestas[p.id]!==''?parseInt(respuestas[p.id]):-1;
+    return{txt:p.txt,resp:sel,correcta:p.correcta};
   });
+  var correctas=caresps.filter(function(r){return r.resp===r.correcta;}).length;
+  var cargoPuntaje=caresps.length?Math.round(correctas/caresps.length*100):0;
+  upsert({candId:candId,tipo:'cargo',resps:caresps,puntaje:cargoPuntaje,fecha:hoy()});
 
+  // ── FICHA CANDIDATO (datos personales auto-reportados) ───────────────
   var etresps=pregsTotal.filter(function(p){return p.grupo==='entrevista';}).map(function(p){
     return{txt:p.txt,resp:respuestas[p.id]||''};
   });
-
-  upsert({candId:candId,tipo:'big5',resps:b5resps,dims:b5dims,fecha:hoy()});
-  upsert({candId:candId,tipo:'screening',resps:scresps,fecha:hoy()});
-  upsert({candId:candId,tipo:'cargo',resps:caresps,fecha:hoy()});
-  upsert({candId:candId,tipo:'entrevista',resps:etresps,fecha:hoy()});
+  upsert({candId:candId,tipo:'ficha_candidato',resps:etresps,fecha:hoy()});
 
   localStorage.setItem('rrhh_resultados',JSON.stringify(allRes));
-  // Guardar resultado final a Firebase
-  autoSaveToFirebase(candId, 'completado', {completado:true, fecha:hoy()});
+  // Sincronizar array completo a Firebase (misma estructura que index.html)
+  try{fbdb.ref('rrhh/resultados').set(allRes).catch(function(err){console.warn('Firebase sync:',err.message);});}catch(e){}
   localStorage.removeItem('rrhh_test_start_'+candId);
 
   document.getElementById('screen-test').style.display='none';

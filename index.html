@@ -1141,11 +1141,11 @@ function pgInforme(){
     var scores=candsPorConv.map(function(c){
       var res=resultados.filter(function(r){return r.candId===c.id;});
       var big5=res.find(function(r){return r.tipo==='big5';});
-      var scl=res.find(function(r){return r.tipo==='scl';});
+      var scl=res.find(function(r){return r.tipo==='scl'||r.tipo==='screening';});
       var cargo=res.find(function(r){return r.tipo==='cargo';});
       var entrevista=res.find(function(r){return r.tipo==='entrevista';});
       var ptos=[];
-      // Big5: dims es objeto {E,A,C,N,O} en escala 1-5 → convertir a 0-100 (N invertido: bajo=mejor)
+      // Big5: dims objeto {E,A,C,N,O} escala 1-5 → 0-100 (N invertido: bajo=mejor)
       var big5Score=null;
       if(big5&&big5.dims){
         var dv=big5.dims;
@@ -1153,20 +1153,30 @@ function pgInforme(){
         big5Score=Math.round(b5vals.reduce(function(s,v){return s+(v||0);},0)/b5vals.length);
         ptos.push(big5Score);
       }
-      // SCL: dims en escala 0-4, mayor=peor → invertir a 0-100
+      // SCL: escala 0-4, mayor=peor → invertir a 0-100. Si no hay dims, calcular de resps
       var sclScore=null;
-      if(scl&&scl.dims){
-        var sclVals=Object.keys(scl.dims).map(function(k){return scl.dims[k];});
-        var sclAvg=sclVals.reduce(function(s,v){return s+v;},0)/sclVals.length;
-        sclScore=Math.max(0,Math.round(100-sclAvg*25));
-        ptos.push(sclScore);
+      if(scl){
+        var sd=scl.dims;
+        if(!sd&&scl.resps&&scl.resps.length){
+          var sg={};
+          scl.resps.forEach(function(r){if(!sg[r.dim])sg[r.dim]=[];var v=r.val||0;sg[r.dim].push(v>4?v-1:v);});
+          sd={};Object.keys(sg).forEach(function(d){sd[d]=Math.round(sg[d].reduce(function(s,v){return s+v;},0)/sg[d].length*10)/10;});
+        }
+        if(sd){
+          var sv=Object.keys(sd).map(function(k){return sd[k];});
+          if(sv.length){var sa=sv.reduce(function(s,v){return s+v;},0)/sv.length;sclScore=Math.max(0,Math.round(100-sa*25));ptos.push(sclScore);}
+        }
       }
-      // Cargo: usar puntaje real (ya en escala 0-100)
+      // Cargo: usar puntaje real, o calcularlo de resps si no existe
       var cargoScore=null;
-      if(cargo&&cargo.puntaje!=null){cargoScore=cargo.puntaje;ptos.push(cargoScore);}
-      // Entrevista: convertir recomendacion a puntaje
-      var entScore=null;var entRec=entrevista?entrevista.recomendacion:null;
-      if(entrevista){var rm={'recomendar':90,'reserva':65,'no recomendar':25};entScore=rm[entRec]!=null?rm[entRec]:65;ptos.push(entScore);}
+      if(cargo){
+        if(cargo.puntaje!=null){cargoScore=cargo.puntaje;}
+        else if(cargo.resps&&cargo.resps.length){var cr=cargo.resps.filter(function(r){return parseInt(r.resp)===r.correcta;}).length;cargoScore=Math.round(cr/cargo.resps.length*100);}
+        if(cargoScore!=null)ptos.push(cargoScore);
+      }
+      // Entrevista HR: recomendacion → puntaje. 'pendiente' si aún no se evalúa
+      var entScore=null;var entRec=entrevista?(entrevista.recomendacion||'pendiente'):null;
+      if(entrevista){var rm={'recomendar':90,'reserva':65,'no recomendar':25,'pendiente':70};entScore=rm[entRec]!=null?rm[entRec]:70;ptos.push(entScore);}
       var score=ptos.length?Math.round(ptos.reduce(function(a,b){return a+b;},0)/ptos.length):0;
       var completo=!!(big5&&scl&&cargo&&entrevista);
       return{id:c.id,nombre:c.apellidos+', '+c.nombres,score:score,ciudad:c.ciudad,completo:completo,
